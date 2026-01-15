@@ -72,37 +72,27 @@ Reglas críticas:
   // MODE: TENDENCIAS (Lilly MX) - NUEVO (lo dejamos como lo tenías)
   // =========================
   const trendsUserPrompt = `
-Necesito un REPORTE MENSUAL DE TENDENCIAS para el equipo de Social Media de Lilly México.
+Necesito un REPORTE MENSUAL DE TENDENCIAS para Social Media de Lilly México.
 
 Contexto fijo:
 - Marca: Lilly México (farmacéutica)
 - Plataformas: LinkedIn, Instagram, Facebook, TikTok
-- Audiencias típicas: público general, pacientes/beneficiarios, cuidadores, profesionales de la salud (HCP), talento/empleo (según plataforma)
-- Objetivo: anticipar temas del último mes y preparar el próximo mes con oportunidades de contenido responsable
+- Importante: No hay navegación web. No inventes métricas, ni “top posts reales”.
+- Sí puedes proponer fuentes RECOMENDADAS con links y referencias en APA (como respaldo), sin afirmar consulta.
 
-Entrega un reporte con:
-1) Resumen ejecutivo (3–5 bullets)
-2) "Último mes: señales y patrones" (NO hechos verificables; solo hipótesis y patrones)
-3) "Próximo mes: oportunidades" incluyendo efemérides de salud probables (sin asegurar fechas exactas; sugiere validar)
-4) Un calendario editorial recomendado por semana (4 semanas) con:
-   - tema
-   - objetivo
-   - plataforma sugerida
-   - formato sugerido
-   - hook sugerido
-   - nota de compliance
-5) Lista de "Temas priorizados" (8–12) con:
-   - por qué importa
-   - enfoque sugerido (educación, prevención, awareness, cultura, employer branding)
-   - riesgos y cómo mitigarlos
-6) Fuentes RECOMENDADAS (links) para respaldar contenido médico y claims, y referencias en APA.
-   - Deben ser fuentes fidedignas típicas: OMS/OPS/CDC/NIH/PubMed/guías clínicas reconocidas.
-   - No afirmes que las consultaste; preséntalas como “recomendadas para respaldo”.
-7) Incluye datasets para 2 gráficas sencillas (Chart.js):
-   A) "Mix recomendado de formatos" (porcentaje) para el mes (global). Debe sumar ~100.
-   B) "Oportunidades por semana" (número de oportunidades propuestas en el calendario).
+Entrega EXACTAMENTE (concisamente):
+1) executive_summary: 3–4 bullets (máx 180 caracteres c/u)
+2) last_month_patterns: 5–6 bullets (máx 170 caracteres)
+3) next_month_opportunities: 5–6 bullets (máx 170 caracteres; si hay efemérides, di “validar fecha”)
+4) weekly_calendar: 4 semanas, 3 items por semana (máx 90–140 caracteres por campo)
+5) priority_topics: 8 temas exactos (strings cortos)
+6) recommended_sources: 6–8 fuentes con url (OMS/OPS/CDC/NIH/PubMed/guías)
+7) apa_references: 6–8 referencias APA (máx 220 caracteres)
+8) charts:
+   - format_mix: 3–5 labels + values que sumen ~100
+   - opportunities_per_week: 4 labels + values = número de items por semana
 
-El reporte debe ser útil, ejecutivo y accionable.
+Devuelve SOLO JSON válido.
 `.trim();
 
   const trendsSchema = {
@@ -469,20 +459,24 @@ Entrega:
   // Router (con tokens por modo)
   const modeConfig = {
     // Nuevos
-    tendencias_lilly_mx: {
-      name: "lilly_trends_report",
-      userPrompt: trendsUserPrompt,
-      schema: trendsSchema,
-      maxTokens: 1200
-    },
+   tendencias_lilly_mx: {
+  name: "lilly_trends_report",
+  userPrompt: trendsUserPrompt,
+  schema: trendsSchema,
+  maxTokens: 2600
+},
     conducta_lilly_mx: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema, maxTokens: 2200 },
 
 
     // Alias (compatibilidad)
     conducta: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema, maxTokens: 2200 },
 
-    // Legacy real para tendencias.html viejo (top5/forecast)
-    tendencias: { name: "trends_report_legacy", userPrompt: legacyTrendsUserPrompt, schema: legacyTrendsSchema, maxTokens: 550 }
+    tendencias: {
+  name: "trends_report_legacy",
+  userPrompt: legacyTrendsUserPrompt,
+  schema: legacyTrendsSchema,
+  maxTokens: 650
+},
     
   };
 
@@ -495,14 +489,9 @@ Entrega:
   try {
     const fullInput = `${systemPrompt}\n\n${userPrompt}`;
 
-    const maxTokensByMode = {
-  tendencias_lilly_mx: 2200,
-  conducta_lilly_mx: 1100,
-  conducta: 1100,
-  tendencias: 650
-};
+ // ✅ Usa el maxTokens del modeConfig (y no dupliques lógica)
+const max_output_tokens = Number(maxTokens || 1100);
 
-const max_output_tokens = maxTokensByMode[mode] ?? 1100;
 
     const r = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
@@ -540,6 +529,15 @@ const max_output_tokens = maxTokensByMode[mode] ?? 1100;
       data?.output?.[0]?.content?.[0]?.text ??
       data?.content?.[0]?.text ??
       "{}";
+    
+    if (typeof jsonText !== "string" || jsonText.trim().length < 2) {
+  console.error("Empty or invalid model output:", data);
+  return res.status(500).json({
+    error: "Empty model output",
+    raw: jsonText
+  });
+}
+
 
     let out = {};
     try {
