@@ -69,7 +69,7 @@ Reglas críticas:
 `.trim();
 
   // =========================
-  // MODE: TENDENCIAS (Lilly MX) - NUEVO
+  // MODE: TENDENCIAS (Lilly MX) - NUEVO (lo dejamos como lo tenías)
   // =========================
   const trendsUserPrompt = `
 Necesito un REPORTE MENSUAL DE TENDENCIAS para el equipo de Social Media de Lilly México.
@@ -221,40 +221,29 @@ El reporte debe ser útil, ejecutivo y accionable.
   };
 
   // =========================
-  // MODE: CONDUCTA (Lilly MX) - NUEVO
+  // MODE: CONDUCTA (Lilly MX) - NUEVO (AJUSTADO PARA QUE NO SE CORTE)
   // =========================
   const behaviorUserPrompt = `
-Necesito un REPORTE DE CONDUCTA DE ALGORITMOS / DIRECTRICES DE FORMATO para Lilly México,
+Necesito un REPORTE DE CONDUCTA / DIRECTRICES DE FORMATO para Lilly México
 en LinkedIn, Instagram, Facebook y TikTok.
 
-Importante:
-- No podemos afirmar “lo mejor del último mes” con datos reales, porque no hay acceso a métricas.
-- En su lugar, entrega mejores prácticas actuales y un “mix recomendado” de formatos por plataforma,
-como guía robusta y estable para el equipo.
+Reglas:
+- No hay acceso a métricas reales: NO inventes “top posts”, % reales ni “lo mejor del mes”.
+- Escribe texto limpio (sin comenzar con • o -).
+- En "signals" NO uses palabras sueltas: escribe frases completas y accionables.
+- Evita duplicar ideas.
 
-FORMATO DE REDACCIÓN (CRÍTICO):
-- En "signals" NO uses palabras sueltas. Escribe frases completas y accionables.
-  Ejemplo: "Comentarios cualificados: fomenta preguntas específicas y responde en <24h."
-- Evita bullets con "•" o "-" al inicio. Escribe texto limpio.
-- Evita duplicar ideas. Si se repite, fusiona.
-- En "recommended_formats.specs" incluye rangos claros (duración/estructura) en 1 frase.
-
-Entrega:
-1) Resumen ejecutivo (3–5 bullets)
-2) Guía por plataforma (LinkedIn/IG/FB/TikTok):
-   - objetivos típicos (awareness, educación, reputación, talento)
-   - señales que suelen pesar (retención, guardados, shares, comentarios, CTR) en términos generales
-   - formatos recomendados + rangos sugeridos (duración, estructura)
-   - directrices de copy (hook, CTA, tono, disclaimers)
-3) “Checklist por formato” (reel/video corto, carrusel, estático, story, live)
-4) “Riesgos y compliance” para pharma (claims, comparativos, fuentes, UGC, comentarios)
-5) Datasets para 2 gráficas:
-   A) Mix recomendado de formatos por plataforma (porcentajes por plataforma). Cada fila debe sumar ~100.
-   B) Prioridad de señales por plataforma (ranking 1–5; 5 es más importante)
-
-Incluye también:
-- Fuentes RECOMENDADAS (links) sobre mejores prácticas de plataforma y comunicación responsable (sin afirmar consulta).
-- Referencias en APA.
+Entrega (conciso):
+1) Resumen ejecutivo (3 bullets)
+2) Por plataforma (4):
+   - goals (2–3)
+   - signals (3–4) en frases accionables
+   - recommended_formats (2–3) con specs (duración/estructura)
+   - copy_guidelines (4–6)
+3) Checklist por formato (4 formatos: video corto, carrusel, estático, stories) con 4–6 checkpoints cada uno
+4) Compliance risks (6–8)
+5) charts:
+   A) format_mix_by_platform (porcentajes por plataforma; cada fila suma ~100)
 `.trim();
 
   const behaviorSchema = {
@@ -268,15 +257,14 @@ Incluye también:
       "platform_guidelines",
       "format_checklist",
       "compliance_risks",
-      "recommended_sources",
-      "apa_references",
       "charts"
     ],
     properties: {
       mode: { type: "string", enum: ["conducta_lilly_mx"] },
       brand: { type: "string" },
       platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-      executive_summary: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
+      executive_summary: { type: "array", minItems: 3, maxItems: 3, items: { type: "string" } },
+
       platform_guidelines: {
         type: "array",
         minItems: 4,
@@ -287,12 +275,12 @@ Incluye también:
           required: ["platform", "goals", "signals", "recommended_formats", "copy_guidelines"],
           properties: {
             platform: { type: "string" },
-            goals: { type: "array", minItems: 2, maxItems: 5, items: { type: "string" } },
-            signals: { type: "array", minItems: 3, maxItems: 6, items: { type: "string" } },
+            goals: { type: "array", minItems: 2, maxItems: 3, items: { type: "string" } },
+            signals: { type: "array", minItems: 3, maxItems: 4, items: { type: "string" } },
             recommended_formats: {
               type: "array",
-              minItems: 3,
-              maxItems: 6,
+              minItems: 2,
+              maxItems: 3,
               items: {
                 type: "object",
                 additionalProperties: false,
@@ -304,45 +292,32 @@ Incluye también:
                 }
               }
             },
-            copy_guidelines: { type: "array", minItems: 4, maxItems: 8, items: { type: "string" } }
+            copy_guidelines: { type: "array", minItems: 4, maxItems: 6, items: { type: "string" } }
           }
         }
       },
+
       format_checklist: {
         type: "array",
         minItems: 4,
-        maxItems: 7,
+        maxItems: 4,
         items: {
           type: "object",
           additionalProperties: false,
           required: ["format", "checkpoints"],
           properties: {
             format: { type: "string" },
-            checkpoints: { type: "array", minItems: 4, maxItems: 10, items: { type: "string" } }
+            checkpoints: { type: "array", minItems: 4, maxItems: 6, items: { type: "string" } }
           }
         }
       },
-      compliance_risks: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
-      recommended_sources: {
-        type: "array",
-        minItems: 6,
-        maxItems: 12,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["name", "url", "use_case"],
-          properties: {
-            name: { type: "string" },
-            url: { type: "string" },
-            use_case: { type: "string" }
-          }
-        }
-      },
-      apa_references: { type: "array", minItems: 6, maxItems: 12, items: { type: "string" } },
+
+      compliance_risks: { type: "array", minItems: 6, maxItems: 8, items: { type: "string" } },
+
       charts: {
         type: "object",
         additionalProperties: false,
-        required: ["format_mix_by_platform", "signal_priority_by_platform"],
+        required: ["format_mix_by_platform"],
         properties: {
           format_mix_by_platform: {
             type: "object",
@@ -350,7 +325,7 @@ Incluye también:
             required: ["platforms", "formats", "values"],
             properties: {
               platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-              formats: { type: "array", minItems: 3, maxItems: 6, items: { type: "string" } },
+              formats: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
               values: {
                 type: "array",
                 minItems: 4,
@@ -358,27 +333,7 @@ Incluye también:
                 items: {
                   type: "array",
                   minItems: 3,
-                  maxItems: 6,
-                  items: { type: "number" }
-                }
-              }
-            }
-          },
-          signal_priority_by_platform: {
-            type: "object",
-            additionalProperties: false,
-            required: ["platforms", "signals", "values"],
-            properties: {
-              platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-              signals: { type: "array", minItems: 4, maxItems: 7, items: { type: "string" } },
-              values: {
-                type: "array",
-                minItems: 4,
-                maxItems: 4,
-                items: {
-                  type: "array",
-                  minItems: 4,
-                  maxItems: 7,
+                  maxItems: 5,
                   items: { type: "number" }
                 }
               }
@@ -417,24 +372,44 @@ Entrega:
     }
   };
 
-  // Router
+  // Router (con tokens por modo)
   const modeConfig = {
     // Nuevos
-    tendencias_lilly_mx: { name: "lilly_trends_report", userPrompt: trendsUserPrompt, schema: trendsSchema },
-    conducta_lilly_mx: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema },
+    tendencias_lilly_mx: {
+      name: "lilly_trends_report",
+      userPrompt: trendsUserPrompt,
+      schema: trendsSchema,
+      maxTokens: 1200
+    },
+    conducta_lilly_mx: {
+      name: "lilly_behavior_report",
+      userPrompt: behaviorUserPrompt,
+      schema: behaviorSchema,
+      maxTokens: 1600
+    },
 
     // Alias (compatibilidad)
-    conducta: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema },
+    conducta: {
+      name: "lilly_behavior_report",
+      userPrompt: behaviorUserPrompt,
+      schema: behaviorSchema,
+      maxTokens: 1600
+    },
 
     // Legacy real para tendencias.html viejo (top5/forecast)
-    tendencias: { name: "trends_report_legacy", userPrompt: legacyTrendsUserPrompt, schema: legacyTrendsSchema }
+    tendencias: {
+      name: "trends_report_legacy",
+      userPrompt: legacyTrendsUserPrompt,
+      schema: legacyTrendsSchema,
+      maxTokens: 700
+    }
   };
 
   if (!modeConfig[mode]) {
     return res.status(400).json({ error: `Unsupported mode: ${mode}` });
   }
 
-  const { name, userPrompt, schema } = modeConfig[mode];
+  const { name, userPrompt, schema, maxTokens = 1000 } = modeConfig[mode];
 
   try {
     const fullInput = `${systemPrompt}\n\n${userPrompt}`;
@@ -448,8 +423,7 @@ Entrega:
       body: JSON.stringify({
         model,
         input: fullInput,
-        // ✅ Controla tiempo/costo y evita respuestas enormes
-        max_output_tokens: 950,
+        max_output_tokens: maxTokens,
         text: {
           format: {
             type: "json_schema",
@@ -469,8 +443,10 @@ Entrega:
 
     const data = await r.json();
 
+    // extractor más robusto
     const jsonText =
       data?.output_text ??
+      data?.output?.[0]?.content?.find?.((c) => c?.type === "output_text")?.text ??
       data?.output?.[0]?.content?.[0]?.text ??
       data?.content?.[0]?.text ??
       "{}";
