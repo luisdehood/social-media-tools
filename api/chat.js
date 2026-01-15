@@ -106,119 +106,158 @@ El reporte debe ser útil, ejecutivo y accionable.
 `.trim();
 
   const trendsSchema = {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "mode",
-      "brand",
-      "platforms",
-      "executive_summary",
-      "last_month_patterns",
-      "next_month_opportunities",
-      "weekly_calendar",
-      "priority_topics",
-      "recommended_sources",
-      "apa_references",
-      "charts"
-    ],
-    properties: {
-      mode: { type: "string", enum: ["tendencias_lilly_mx"] },
-      brand: { type: "string" },
-      platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-      executive_summary: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
-      last_month_patterns: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
-      next_month_opportunities: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
-      weekly_calendar: {
-        type: "array",
-        minItems: 4,
-        maxItems: 4,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["week_label", "items"],
-          properties: {
-            week_label: { type: "string" },
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "mode",
+    "brand",
+    "platforms",
+    "executive_summary",
+    "last_month_patterns",
+    "next_month_opportunities",
+    "weekly_calendar",
+    "priority_topics",
+    "recommended_sources",
+    "apa_references",
+    "charts"
+  ],
+  properties: {
+    mode: { type: "string", enum: ["tendencias_lilly_mx"] },
+    brand: { type: "string", maxLength: 60 },
+    platforms: {
+      type: "array",
+      minItems: 4,
+      maxItems: 4,
+      items: { type: "string", maxLength: 20 }
+    },
+
+    executive_summary: {
+      type: "array",
+      minItems: 3,
+      maxItems: 4,
+      items: { type: "string", maxLength: 180 }
+    },
+
+    last_month_patterns: {
+      type: "array",
+      minItems: 5,
+      maxItems: 6,
+      items: { type: "string", maxLength: 170 }
+    },
+
+    next_month_opportunities: {
+      type: "array",
+      minItems: 5,
+      maxItems: 6,
+      items: { type: "string", maxLength: 170 }
+    },
+
+    weekly_calendar: {
+      type: "array",
+      minItems: 4,
+      maxItems: 4,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["week_label", "items"],
+        properties: {
+          week_label: { type: "string", maxLength: 40 },
+          items: {
+            type: "array",
+            minItems: 3,
+            maxItems: 3,
             items: {
-              type: "array",
-              minItems: 3,
-              maxItems: 6,
-              items: {
-                type: "object",
-                additionalProperties: false,
-                required: ["theme", "objective", "platform", "format", "hook", "compliance_note"],
-                properties: {
-                  theme: { type: "string" },
-                  objective: { type: "string" },
-                  platform: { type: "string" },
-                  format: { type: "string" },
-                  hook: { type: "string" },
-                  compliance_note: { type: "string" }
-                }
+              type: "object",
+              additionalProperties: false,
+              required: ["theme", "objective", "platform", "format", "hook", "compliance_note"],
+              properties: {
+                theme: { type: "string", maxLength: 90 },
+                objective: { type: "string", maxLength: 120 },
+                platform: { type: "string", maxLength: 20 },
+                format: { type: "string", maxLength: 60 },
+                hook: { type: "string", maxLength: 140 },
+                compliance_note: { type: "string", maxLength: 140 }
               }
             }
           }
         }
-      },
-      priority_topics: {
-        type: "array",
-        minItems: 8,
-        maxItems: 12,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["topic", "why_it_matters", "recommended_angle", "risk_flags", "mitigation"],
-          properties: {
-            topic: { type: "string" },
-            why_it_matters: { type: "string" },
-            recommended_angle: { type: "string" },
-            risk_flags: { type: "array", minItems: 1, maxItems: 5, items: { type: "string" } },
-            mitigation: { type: "string" }
-          }
-        }
-      },
-      recommended_sources: {
-        type: "array",
-        minItems: 6,
-        maxItems: 12,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["name", "url", "use_case"],
-          properties: {
-            name: { type: "string" },
-            url: { type: "string" },
-            use_case: { type: "string" }
-          }
-        }
-      },
-      apa_references: { type: "array", minItems: 6, maxItems: 12, items: { type: "string" } },
-      charts: {
+      }
+    },
+
+    priority_topics: {
+      type: "array",
+      minItems: 8,
+      maxItems: 8,
+      items: {
         type: "object",
         additionalProperties: false,
-        required: ["format_mix", "opportunities_per_week"],
+        required: ["topic", "why_it_matters", "recommended_angle", "risk_flags", "mitigation"],
         properties: {
-          format_mix: {
-            type: "object",
-            additionalProperties: false,
-            required: ["labels", "values"],
-            properties: {
-              labels: { type: "array", minItems: 3, maxItems: 6, items: { type: "string" } },
-              values: { type: "array", minItems: 3, maxItems: 6, items: { type: "number" } }
-            }
+          topic: { type: "string", maxLength: 70 },
+          why_it_matters: { type: "string", maxLength: 160 },
+          recommended_angle: { type: "string", maxLength: 120 },
+          risk_flags: {
+            type: "array",
+            minItems: 2,
+            maxItems: 3,
+            items: { type: "string", maxLength: 90 }
           },
-          opportunities_per_week: {
-            type: "object",
-            additionalProperties: false,
-            required: ["labels", "values"],
-            properties: {
-              labels: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-              values: { type: "array", minItems: 4, maxItems: 4, items: { type: "number" } }
-            }
+          mitigation: { type: "string", maxLength: 140 }
+        }
+      }
+    },
+
+    recommended_sources: {
+      type: "array",
+      minItems: 6,
+      maxItems: 8,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["name", "url", "use_case"],
+        properties: {
+          name: { type: "string", maxLength: 80 },
+          url: { type: "string", maxLength: 220 },
+          use_case: { type: "string", maxLength: 110 }
+        }
+      }
+    },
+
+    apa_references: {
+      type: "array",
+      minItems: 6,
+      maxItems: 8,
+      items: { type: "string", maxLength: 220 }
+    },
+
+    charts: {
+      type: "object",
+      additionalProperties: false,
+      required: ["format_mix", "opportunities_per_week"],
+      properties: {
+        format_mix: {
+          type: "object",
+          additionalProperties: false,
+          required: ["labels", "values"],
+          properties: {
+            labels: { type: "array", minItems: 3, maxItems: 5, items: { type: "string", maxLength: 30 } },
+            values: { type: "array", minItems: 3, maxItems: 5, items: { type: "number" } }
+          }
+        },
+        opportunities_per_week: {
+          type: "object",
+          additionalProperties: false,
+          required: ["labels", "values"],
+          properties: {
+            labels: { type: "array", minItems: 4, maxItems: 4, items: { type: "string", maxLength: 20 } },
+            values: { type: "array", minItems: 4, maxItems: 4, items: { type: "number" } }
           }
         }
       }
     }
-  };
+  }
+};
+
 
   // =========================
   // MODE: CONDUCTA (Lilly MX) - NUEVO (AJUSTADO PARA QUE NO SE CORTE)
@@ -456,6 +495,15 @@ Entrega:
   try {
     const fullInput = `${systemPrompt}\n\n${userPrompt}`;
 
+    const maxTokensByMode = {
+  tendencias_lilly_mx: 2200,
+  conducta_lilly_mx: 1100,
+  conducta: 1100,
+  tendencias: 650
+};
+
+const max_output_tokens = maxTokensByMode[mode] ?? 1100;
+
     const r = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
       headers: {
@@ -465,7 +513,7 @@ Entrega:
       body: JSON.stringify({
         model,
         input: fullInput,
-        max_output_tokens: maxTokens,
+        max_output_tokens,
         text: {
           format: {
             type: "json_schema",
