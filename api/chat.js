@@ -227,122 +227,177 @@ El reporte debe ser útil, ejecutivo y accionable.
 Necesito un REPORTE DE CONDUCTA / DIRECTRICES DE FORMATO para Lilly México
 en LinkedIn, Instagram, Facebook y TikTok.
 
-Reglas:
-- No hay acceso a métricas reales: NO inventes “top posts”, % reales ni “lo mejor del mes”.
-- Escribe texto limpio (sin comenzar con • o -).
-- En "signals" NO uses palabras sueltas: escribe frases completas y accionables.
-- Evita duplicar ideas.
+REGLAS DE CONCISIÓN (OBLIGATORIO):
+- Cada string (bullet) debe tener máximo 120 caracteres.
+- No uses "•" ni "-" al inicio.
+- No repitas ideas.
+- Evita párrafos: solo frases cortas.
 
-Entrega (conciso):
-1) Resumen ejecutivo (3 bullets)
-2) Por plataforma (4):
-   - goals (2–3)
-   - signals (3–4) en frases accionables
-   - recommended_formats (2–3) con specs (duración/estructura)
-   - copy_guidelines (4–6)
-3) Checklist por formato (4 formatos: video corto, carrusel, estático, stories) con 4–6 checkpoints cada uno
-4) Compliance risks (6–8)
-5) charts:
-   A) format_mix_by_platform (porcentajes por plataforma; cada fila suma ~100)
+Entrega EXACTAMENTE:
+1) executive_summary: 3 bullets
+2) platform_guidelines: 4 objetos (uno por plataforma) con:
+   - goals: 2 bullets
+   - signals: 3 bullets (frases accionables, no palabras sueltas)
+   - recommended_formats: 2 formatos (specs en 1 frase)
+   - copy_guidelines: 4 bullets
+3) format_checklist: 4 formatos (video corto, carrusel, estático, stories) con 4 checkpoints c/u
+4) compliance_risks: 6 bullets
+5) charts.format_mix_by_platform:
+   - platforms: 4
+   - formats: 3 a 4
+   - values: 4 filas que sumen ~100
+
+No incluyas fuentes ni APA en este modo.
 `.trim();
 
   const behaviorSchema = {
-    type: "object",
-    additionalProperties: false,
-    required: [
-      "mode",
-      "brand",
-      "platforms",
-      "executive_summary",
-      "platform_guidelines",
-      "format_checklist",
-      "compliance_risks",
-      "charts"
-    ],
-    properties: {
-      mode: { type: "string", enum: ["conducta_lilly_mx"] },
-      brand: { type: "string" },
-      platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-      executive_summary: { type: "array", minItems: 3, maxItems: 3, items: { type: "string" } },
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "mode",
+    "brand",
+    "platforms",
+    "executive_summary",
+    "platform_guidelines",
+    "format_checklist",
+    "compliance_risks",
+    "charts"
+  ],
+  properties: {
+    mode: { type: "string", enum: ["conducta_lilly_mx"] },
+    brand: { type: "string", maxLength: 40 },
+    platforms: {
+      type: "array",
+      minItems: 4,
+      maxItems: 4,
+      items: { type: "string", maxLength: 16 }
+    },
 
-      platform_guidelines: {
-        type: "array",
-        minItems: 4,
-        maxItems: 4,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["platform", "goals", "signals", "recommended_formats", "copy_guidelines"],
-          properties: {
-            platform: { type: "string" },
-            goals: { type: "array", minItems: 2, maxItems: 3, items: { type: "string" } },
-            signals: { type: "array", minItems: 3, maxItems: 4, items: { type: "string" } },
-            recommended_formats: {
-              type: "array",
-              minItems: 2,
-              maxItems: 3,
-              items: {
-                type: "object",
-                additionalProperties: false,
-                required: ["format", "when_to_use", "specs"],
-                properties: {
-                  format: { type: "string" },
-                  when_to_use: { type: "string" },
-                  specs: { type: "string" }
-                }
-              }
-            },
-            copy_guidelines: { type: "array", minItems: 4, maxItems: 6, items: { type: "string" } }
-          }
-        }
-      },
+    executive_summary: {
+      type: "array",
+      minItems: 3,
+      maxItems: 3,
+      items: { type: "string", maxLength: 120 }
+    },
 
-      format_checklist: {
-        type: "array",
-        minItems: 4,
-        maxItems: 4,
-        items: {
-          type: "object",
-          additionalProperties: false,
-          required: ["format", "checkpoints"],
-          properties: {
-            format: { type: "string" },
-            checkpoints: { type: "array", minItems: 4, maxItems: 6, items: { type: "string" } }
-          }
-        }
-      },
-
-      compliance_risks: { type: "array", minItems: 6, maxItems: 8, items: { type: "string" } },
-
-      charts: {
+    platform_guidelines: {
+      type: "array",
+      minItems: 4,
+      maxItems: 4,
+      items: {
         type: "object",
         additionalProperties: false,
-        required: ["format_mix_by_platform"],
+        required: ["platform", "goals", "signals", "recommended_formats", "copy_guidelines"],
         properties: {
-          format_mix_by_platform: {
-            type: "object",
-            additionalProperties: false,
-            required: ["platforms", "formats", "values"],
-            properties: {
-              platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
-              formats: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
-              values: {
+          platform: { type: "string", maxLength: 16 },
+
+          goals: {
+            type: "array",
+            minItems: 2,
+            maxItems: 2,
+            items: { type: "string", maxLength: 120 }
+          },
+
+          signals: {
+            type: "array",
+            minItems: 3,
+            maxItems: 3,
+            items: { type: "string", maxLength: 120 }
+          },
+
+          recommended_formats: {
+            type: "array",
+            minItems: 2,
+            maxItems: 2,
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["format", "when_to_use", "specs"],
+              properties: {
+                format: { type: "string", maxLength: 28 },
+                when_to_use: { type: "string", maxLength: 120 },
+                specs: { type: "string", maxLength: 120 }
+              }
+            }
+          },
+
+          copy_guidelines: {
+            type: "array",
+            minItems: 4,
+            maxItems: 4,
+            items: { type: "string", maxLength: 120 }
+          }
+        }
+      }
+    },
+
+    format_checklist: {
+      type: "array",
+      minItems: 4,
+      maxItems: 4,
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["format", "checkpoints"],
+        properties: {
+          format: { type: "string", maxLength: 18 },
+          checkpoints: {
+            type: "array",
+            minItems: 4,
+            maxItems: 4,
+            items: { type: "string", maxLength: 120 }
+          }
+        }
+      }
+    },
+
+    compliance_risks: {
+      type: "array",
+      minItems: 6,
+      maxItems: 6,
+      items: { type: "string", maxLength: 120 }
+    },
+
+    charts: {
+      type: "object",
+      additionalProperties: false,
+      required: ["format_mix_by_platform"],
+      properties: {
+        format_mix_by_platform: {
+          type: "object",
+          additionalProperties: false,
+          required: ["platforms", "formats", "values"],
+          properties: {
+            platforms: {
+              type: "array",
+              minItems: 4,
+              maxItems: 4,
+              items: { type: "string", maxLength: 16 }
+            },
+            formats: {
+              type: "array",
+              minItems: 3,
+              maxItems: 4,
+              items: { type: "string", maxLength: 18 }
+            },
+            values: {
+              type: "array",
+              minItems: 4,
+              maxItems: 4,
+              items: {
                 type: "array",
-                minItems: 4,
+                minItems: 3,
                 maxItems: 4,
-                items: {
-                  type: "array",
-                  minItems: 3,
-                  maxItems: 5,
-                  items: { type: "number" }
-                }
+                items: { type: "number" }
               }
             }
           }
         }
       }
     }
-  };
+  }
+};
+
 
   // =========================
   // LEGACY: TENDENCIAS (modo viejo) - para no romper tu tendencias.html actual
@@ -381,28 +436,15 @@ Entrega:
       schema: trendsSchema,
       maxTokens: 1200
     },
-    conducta_lilly_mx: {
-      name: "lilly_behavior_report",
-      userPrompt: behaviorUserPrompt,
-      schema: behaviorSchema,
-      maxTokens: 1600
-    },
+    conducta_lilly_mx: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema, maxTokens: 2200 },
+
 
     // Alias (compatibilidad)
-    conducta: {
-      name: "lilly_behavior_report",
-      userPrompt: behaviorUserPrompt,
-      schema: behaviorSchema,
-      maxTokens: 1600
-    },
+    conducta: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema, maxTokens: 2200 },
 
     // Legacy real para tendencias.html viejo (top5/forecast)
-    tendencias: {
-      name: "trends_report_legacy",
-      userPrompt: legacyTrendsUserPrompt,
-      schema: legacyTrendsSchema,
-      maxTokens: 700
-    }
+    tendencias: { name: "trends_report_legacy", userPrompt: legacyTrendsUserPrompt, schema: legacyTrendsSchema, maxTokens: 550 }
+    
   };
 
   if (!modeConfig[mode]) {
