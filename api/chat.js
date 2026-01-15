@@ -38,7 +38,14 @@ export default async function handler(req, res) {
   }
 
   // ✅ Nuevos modos (sin necesidad de platform/region/days desde UI)
-  const { mode = "tendencias_lilly_mx" } = payload;
+  const {
+    mode = "tendencias_lilly_mx",
+    // Legacy params (por si tu HTML viejo los manda)
+    platform = "all",
+    region = "MX",
+    days = 30,
+    topic = ""
+  } = payload;
 
   const apiKey = process.env.OPENAI_API_KEY;
   const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
@@ -62,7 +69,7 @@ Reglas críticas:
 `.trim();
 
   // =========================
-  // MODE: TENDENCIAS (Lilly MX)
+  // MODE: TENDENCIAS (Lilly MX) - NUEVO
   // =========================
   const trendsUserPrompt = `
 Necesito un REPORTE MENSUAL DE TENDENCIAS para el equipo de Social Media de Lilly México.
@@ -92,7 +99,7 @@ Entrega un reporte con:
    - Deben ser fuentes fidedignas típicas: OMS/OPS/CDC/NIH/PubMed/guías clínicas reconocidas.
    - No afirmes que las consultaste; preséntalas como “recomendadas para respaldo”.
 7) Incluye datasets para 2 gráficas sencillas (Chart.js):
-   A) "Mix recomendado de formatos" (porcentaje) para el mes (global).
+   A) "Mix recomendado de formatos" (porcentaje) para el mes (global). Debe sumar ~100.
    B) "Oportunidades por semana" (número de oportunidades propuestas en el calendario).
 
 El reporte debe ser útil, ejecutivo y accionable.
@@ -117,30 +124,10 @@ El reporte debe ser útil, ejecutivo y accionable.
     properties: {
       mode: { type: "string", enum: ["tendencias_lilly_mx"] },
       brand: { type: "string" },
-      platforms: {
-        type: "array",
-        minItems: 4,
-        maxItems: 4,
-        items: { type: "string" }
-      },
-      executive_summary: {
-        type: "array",
-        minItems: 3,
-        maxItems: 5,
-        items: { type: "string" }
-      },
-      last_month_patterns: {
-        type: "array",
-        minItems: 5,
-        maxItems: 10,
-        items: { type: "string" }
-      },
-      next_month_opportunities: {
-        type: "array",
-        minItems: 5,
-        maxItems: 10,
-        items: { type: "string" }
-      },
+      platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
+      executive_summary: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
+      last_month_patterns: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
+      next_month_opportunities: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
       weekly_calendar: {
         type: "array",
         minItems: 4,
@@ -204,12 +191,7 @@ El reporte debe ser útil, ejecutivo y accionable.
           }
         }
       },
-      apa_references: {
-        type: "array",
-        minItems: 6,
-        maxItems: 12,
-        items: { type: "string" }
-      },
+      apa_references: { type: "array", minItems: 6, maxItems: 12, items: { type: "string" } },
       charts: {
         type: "object",
         additionalProperties: false,
@@ -239,7 +221,7 @@ El reporte debe ser útil, ejecutivo y accionable.
   };
 
   // =========================
-  // MODE: CONDUCTA (Lilly MX)
+  // MODE: CONDUCTA (Lilly MX) - NUEVO
   // =========================
   const behaviorUserPrompt = `
 Necesito un REPORTE DE CONDUCTA DE ALGORITMOS / DIRECTRICES DE FORMATO para Lilly México,
@@ -249,6 +231,13 @@ Importante:
 - No podemos afirmar “lo mejor del último mes” con datos reales, porque no hay acceso a métricas.
 - En su lugar, entrega mejores prácticas actuales y un “mix recomendado” de formatos por plataforma,
 como guía robusta y estable para el equipo.
+
+FORMATO DE REDACCIÓN (CRÍTICO):
+- En "signals" NO uses palabras sueltas. Escribe frases completas y accionables.
+  Ejemplo: "Comentarios cualificados: fomenta preguntas específicas y responde en <24h."
+- Evita bullets con "•" o "-" al inicio. Escribe texto limpio.
+- Evita duplicar ideas. Si se repite, fusiona.
+- En "recommended_formats.specs" incluye rangos claros (duración/estructura) en 1 frase.
 
 Entrega:
 1) Resumen ejecutivo (3–5 bullets)
@@ -260,7 +249,7 @@ Entrega:
 3) “Checklist por formato” (reel/video corto, carrusel, estático, story, live)
 4) “Riesgos y compliance” para pharma (claims, comparativos, fuentes, UGC, comentarios)
 5) Datasets para 2 gráficas:
-   A) Mix recomendado de formatos por plataforma (porcentajes)
+   A) Mix recomendado de formatos por plataforma (porcentajes por plataforma). Cada fila debe sumar ~100.
    B) Prioridad de señales por plataforma (ranking 1–5; 5 es más importante)
 
 Incluye también:
@@ -286,18 +275,8 @@ Incluye también:
     properties: {
       mode: { type: "string", enum: ["conducta_lilly_mx"] },
       brand: { type: "string" },
-      platforms: {
-        type: "array",
-        minItems: 4,
-        maxItems: 4,
-        items: { type: "string" }
-      },
-      executive_summary: {
-        type: "array",
-        minItems: 3,
-        maxItems: 5,
-        items: { type: "string" }
-      },
+      platforms: { type: "array", minItems: 4, maxItems: 4, items: { type: "string" } },
+      executive_summary: { type: "array", minItems: 3, maxItems: 5, items: { type: "string" } },
       platform_guidelines: {
         type: "array",
         minItems: 4,
@@ -325,12 +304,7 @@ Incluye también:
                 }
               }
             },
-            copy_guidelines: {
-              type: "array",
-              minItems: 4,
-              maxItems: 8,
-              items: { type: "string" }
-            }
+            copy_guidelines: { type: "array", minItems: 4, maxItems: 8, items: { type: "string" } }
           }
         }
       },
@@ -348,12 +322,7 @@ Incluye también:
           }
         }
       },
-      compliance_risks: {
-        type: "array",
-        minItems: 5,
-        maxItems: 10,
-        items: { type: "string" }
-      },
+      compliance_risks: { type: "array", minItems: 5, maxItems: 10, items: { type: "string" } },
       recommended_sources: {
         type: "array",
         minItems: 6,
@@ -369,12 +338,7 @@ Incluye también:
           }
         }
       },
-      apa_references: {
-        type: "array",
-        minItems: 6,
-        maxItems: 12,
-        items: { type: "string" }
-      },
+      apa_references: { type: "array", minItems: 6, maxItems: 12, items: { type: "string" } },
       charts: {
         type: "object",
         additionalProperties: false,
@@ -425,18 +389,45 @@ Incluye también:
     }
   };
 
+  // =========================
+  // LEGACY: TENDENCIAS (modo viejo) - para no romper tu tendencias.html actual
+  // =========================
+  const legacyTrendsUserPrompt = `
+Parámetros:
+- Plataforma: ${platform}
+- Región: ${region}
+- Ventana: últimos ${days} días
+- Tema (opcional): ${topic || "—"}
+
+Entrega:
+- "top5": 5 bullets concretos sobre lo que más creció/funcionó en la ventana indicada.
+- "forecast": 3 bullets con hipótesis para el próximo mes (temas/formatos a apostar).
+- Evita números inventados; usa lenguaje de tendencia.
+- Tono ejecutivo.
+- Devuelve texto limpio (sin empezar con "•" o "-").
+`.trim();
+
+  const legacyTrendsSchema = {
+    type: "object",
+    additionalProperties: false,
+    required: ["top5", "forecast"],
+    properties: {
+      top5: { type: "array", minItems: 5, maxItems: 5, items: { type: "string" } },
+      forecast: { type: "array", minItems: 3, maxItems: 3, items: { type: "string" } }
+    }
+  };
+
   // Router
   const modeConfig = {
-    tendencias_lilly_mx: {
-      name: "lilly_trends_report",
-      userPrompt: trendsUserPrompt,
-      schema: trendsSchema
-    },
-    conducta_lilly_mx: {
-      name: "lilly_behavior_report",
-      userPrompt: behaviorUserPrompt,
-      schema: behaviorSchema
-    }
+    // Nuevos
+    tendencias_lilly_mx: { name: "lilly_trends_report", userPrompt: trendsUserPrompt, schema: trendsSchema },
+    conducta_lilly_mx: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema },
+
+    // Alias (compatibilidad)
+    conducta: { name: "lilly_behavior_report", userPrompt: behaviorUserPrompt, schema: behaviorSchema },
+
+    // Legacy real para tendencias.html viejo (top5/forecast)
+    tendencias: { name: "trends_report_legacy", userPrompt: legacyTrendsUserPrompt, schema: legacyTrendsSchema }
   };
 
   if (!modeConfig[mode]) {
@@ -457,6 +448,8 @@ Incluye también:
       body: JSON.stringify({
         model,
         input: fullInput,
+        // ✅ Controla tiempo/costo y evita respuestas enormes
+        max_output_tokens: 950,
         text: {
           format: {
             type: "json_schema",
