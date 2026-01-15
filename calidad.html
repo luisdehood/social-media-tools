@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lilly — Calidad y performance</title>
+  <meta name="description" content="Análisis de calidad de post: imagen y copy para estimar performance." />
+  <meta name="color-scheme" content="light" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --lilly-red:#DF3024; --lilly-red-dark:#C1281E;
+      --bg-soft:#ffffff; --text:#3f3f3f; --white:#fff; --muted:rgba(55, 55, 55, 0.65);
+      --shadow:0 8px 24px rgba(0,0,0,.08); --radius:18px; --radius-lg:22px; --container:1120px;
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif;
+      background: var(--bg-soft);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      /* patrón punteado sutil como la landing */
+      background-image: radial-gradient(rgba(0,0,0,.12) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .wrap{ max-width:var(--container); margin:0 auto; padding:28px 20px 64px; flex:1; display:flex; flex-direction:column; gap:24px }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:32px; padding-top:12px; width:100vw; padding:0 20px; }
+    .topbar-inner{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
+    .brand{ display:inline-flex; align-items:center; gap:12px; min-height:60px }
+    .brand img{ display:block; height:44px }
+    .brand-fallback{ font-family:"Georgia","Times New Roman",serif; font-size:35px; font-style:italic; color:var(--lilly-red); text-shadow:0 2px 0 rgba(0,0,0,.05) }
+    .title{ font-family:'Bebas Neue', sans-serif; font-weight:bold; letter-spacing:.5px; font-size:clamp(16px, 2.2vw, 24px); color:#111; text-transform:uppercase; user-select:none; }
+
+    .actions{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between }
+    .back{ display:inline-flex; align-items:center; gap:8px; background:#111; color:#fff; border:0; border-radius:999px; padding:10px 16px; font-weight:800; cursor:pointer; box-shadow:var(--shadow); text-decoration:none; }
+    .back:hover{ filter:brightness(1.1); }
+    .filters{ display:flex; flex-wrap:wrap; gap:10px; align-items:center }
+    .select,.input,.textarea{
+      background:var(--white); border:1.5px solid rgba(0,0,0,.08); border-radius:12px; box-shadow:var(--shadow); color:var(--text)
+    }
+    .select,.input{ padding:10px 12px; min-height:40px }
+    .textarea{ width:100%; padding:14px 16px; min-height:140px; resize:vertical; line-height:1.4 }
+    .run{ background:#111; color:#fff; border:0; border-radius:14px; padding:12px 18px; font-weight:800; cursor:pointer; box-shadow:var(--shadow); }
+    .run:hover{ filter:brightness(1.1); }
+
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
+    .card{ background:var(--white); border-radius:12px; box-shadow:0 12px 24px rgba(0,0,0,.15); padding:18px; }
+    .card h2{ margin:0 0 10px; font-size:22px; color:#111; font-family:'Bebas Neue', sans-serif; letter-spacing:.3px; text-transform:uppercase; }
+    .muted{ color:var(--muted); font-size:13px }
+    .row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+
+    /* Uploader */
+    .drop{
+      border:2px dashed rgba(0,0,0,.15); border-radius:16px; padding:16px; text-align:center;
+      background:linear-gradient(0deg,rgba(255,255,255,.8),rgba(255,255,255,.8));
+    }
+    .preview{ display:flex; align-items:center; justify-content:center; width:100%; aspect-ratio:9/16; background:#fff; border-radius:12px; overflow:hidden; box-shadow:var(--shadow) }
+    .preview img{ max-width:100%; max-height:100%; display:block; object-fit:cover }
+    .preview video{ max-width:100%; max-height:100%; display:block; object-fit:cover }
+    .preview-info{ margin-top:8px; font-size:12px; color:var(--muted); }
+
+    /* Score */
+    .score-wrap{ display:flex; flex-direction:column; gap:8px }
+    .score-bar{ height:16px; background:rgba(0,0,0,.08); border-radius:999px; overflow:hidden }
+    .score-fill{ height:100%; width:0%; background:var(--lilly-red); transition:width .4s ease }
+    .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+    .kpi{ background:#fff; border-radius:12px; padding:10px 12px; box-shadow:var(--shadow); display:flex; justify-content:space-between; align-items:center }
+
+    ul{ margin:10px 0 0 18px } li{ margin:6px 0 }
+
+    .loading{ display:none; align-items:center; gap:10px; color:var(--muted); font-weight:600 }
+    .dot{ width:8px; height:8px; border-radius:50%; background:var(--lilly-red); animation:pulse 1s infinite ease-in-out }
+    .dot:nth-child(2){ animation-delay:.2s } .dot:nth-child(3){ animation-delay:.4s }
+    @keyframes pulse{ 0%,100%{ transform:scale(.7); opacity:.6 } 50%{ transform:scale(1); opacity:1 } }
+
+    footer{ position:fixed; bottom:0; left:0; width:100%; background:var(--bg-soft); text-align:center; padding:10px 0; font-size:12px; color:rgba(122,20,15,.7); user-select:none; box-shadow:0 -2px 6px rgba(0,0,0,.06); }
+    footer p{ font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:12px; color:#111; opacity:.7; text-align:center; }
+
+    @media (max-width:1000px){ .grid{ grid-template-columns:1fr } .kpis{ grid-template-columns:1fr } }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="Barra superior">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Lilly">
+        <img src="assets/lilly-logo.svg" alt="Lilly" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="brand-fallback" style="display:none">Lilly</span>
+      </div>
+      <h1 class="title">SOCIAL MEDIA TOOLS BY HOOD.</h1>
+    </div>
+  </header>
+  <main class="wrap" role="main">
+
+    <div class="actions">
+      <a class="back" href="index.html">⟵ Volver</a>
+      <div class="filters" role="group" aria-label="Contexto">
+        <select id="platform" class="select" aria-label="Plataforma">
+          <option>Instagram</option><option>Facebook</option><option>TikTok</option>
+          <option>LinkedIn</option><option>X (Twitter)</option>
+        </select>
+        <select id="region" class="select" aria-label="Región">
+          <option>México</option><option>LATAM</option><option>Global</option>
+        </select>
+        <input id="schedule" class="input" type="time" value="19:00" aria-label="Hora de publicación sugerida" title="Hora objetivo" />
+        <button id="run" class="run">Analizar post</button>
+      </div>
+    </div>
+
+    <section class="grid">
+      <!-- Lado izquierdo: carga de imagen + copy -->
+      <article class="card">
+        <h2>Tu post</h2>
+        <p class="muted">Sube la **imagen** y pega el **copy**. Calculamos calidad y te damos ajustes.</p>
+
+        <div class="row">
+          <div class="drop" style="flex:1; min-width:240px">
+            <input id="file" type="file" accept="image/*,video/*" style="display:none" />
+            <div id="dropzone" class="preview" role="img" aria-label="Vista previa">
+              <span class="muted">Arrastra una imagen aquí o <button id="browse" class="run" type="button">Buscar…</button></span>
+            </div>
+            <div id="previewInfo" class="preview-info">Formato: —</div>
+          </div>
+          <div style="flex:1; min-width:260px">
+            <textarea id="copy" class="textarea" placeholder="Pega aquí tu copy…" aria-label="Copy del post"></textarea>
+            <div class="muted" id="metrics">0 caracteres • 0 palabras • #hashtags: 0</div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Lado derecho: score y métricas -->
+      <article class="card">
+        <h2>Calidad y performance (estimado)</h2>
+        <div class="score-wrap">
+          <div class="score-bar" aria-label="Barra de score">
+            <div id="scoreFill" class="score-fill"></div>
+          </div>
+          <div class="row" style="justify-content:space-between">
+            <strong id="scoreLabel">—%</strong>
+            <span class="muted" id="contextLabel">Plataforma: Instagram • Región: México • Hora: 19:00</span>
+          </div>
+        </div>
+
+        <div class="kpis" style="margin-top:12px">
+          <div class="kpi"><span>Longitud ideal</span><strong id="lenKpi">—</strong></div>
+          <div class="kpi"><span>Hashtags</span><strong id="hashKpi">—</strong></div>
+          <div class="kpi"><span>Legibilidad</span><strong id="readKpi">—</strong></div>
+          <div class="kpi"><span>Compliance quick check</span><strong id="compKpi">—</strong></div>
+        </div>
+      </article>
+
+      <!-- Recomendaciones -->
+      <article class="card">
+        <h2>Recomendaciones</h2>
+        <p class="muted">Ajustes concretos para mejorar el rendimiento.</p>
+        <ul id="advices">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Checklist de publicación -->
+      <article class="card">
+        <h2>Checklist de publicación</h2>
+        <ul id="checklist">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+    </section>
+
+    <div id="loading" class="loading" aria-live="polite" style="margin-top:8px">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      Analizando calidad del post…
+    </div>
+
+    <footer><p>© 2025 Social Media Tools by Hood. All Rights Reserved.</p></footer>
+  </main>
+
+  <script>
+    // --------- Helpers UI ----------
+    const $platform = document.getElementById('platform');
+    const $region = document.getElementById('region');
+    const $time = document.getElementById('schedule');
+    const $run = document.getElementById('run');
+    const $loading = document.getElementById('loading');
+
+    const $file = document.getElementById('file');
+    const $drop = document.getElementById('dropzone');
+    const $browse = document.getElementById('browse');
+    const $copy = document.getElementById('copy');
+    const $metrics = document.getElementById('metrics');
+
+    const $scoreFill = document.getElementById('scoreFill');
+    const $scoreLabel = document.getElementById('scoreLabel');
+    const $contextLabel = document.getElementById('contextLabel');
+
+    const $lenKpi = document.getElementById('lenKpi');
+    const $hashKpi = document.getElementById('hashKpi');
+    const $readKpi = document.getElementById('readKpi');
+    const $compKpi = document.getElementById('compKpi');
+
+    const $advices = document.getElementById('advices');
+    const $checklist = document.getElementById('checklist');
+    const $previewInfo = document.getElementById('previewInfo');
+
+    function renderList(el, items){
+      el.innerHTML = '';
+      items.forEach(t => { const li = document.createElement('li'); li.textContent = t; el.appendChild(li); });
+    }
+    function countHashtags(text){ return (text.match(/#[\p{L}\p{N}_]+/gu)||[]).length; }
+    function countWords(text){ return (text.trim().match(/\S+/g)||[]).length; }
+    function readability(text){
+      // Heurística muy simple (placeholder): frases cortas y puntuación básica
+      const sentences = text.split(/[.!?]+/).filter(Boolean).length || 1;
+      const words = countWords(text) || 1;
+      const avg = words / sentences;
+      if (avg <= 14) return 'Alta';
+      if (avg <= 20) return 'Media';
+      return 'Baja';
+    }
+    function updateMetrics(){
+      const t = $copy.value || '';
+      $metrics.textContent = `${t.length} caracteres • ${countWords(t)} palabras • #hashtags: ${countHashtags(t)}`;
+    }
+    function updateContext(){
+      $contextLabel.textContent = `Plataforma: ${$platform.value} • Región: ${$region.value} • Hora: ${$time.value || '—'}`;
+    }
+
+    // --------- Uploader ----------
+    $browse.addEventListener('click', ()=> $file.click());
+    $file.addEventListener('change', handleFiles);
+    $drop.addEventListener('dragover', e => { e.preventDefault(); $drop.style.opacity = .9; });
+    $drop.addEventListener('dragleave', ()=> { $drop.style.opacity = 1; });
+    $drop.addEventListener('drop', e => { e.preventDefault(); $drop.style.opacity = 1; if(e.dataTransfer.files?.[0]) setPreview(e.dataTransfer.files[0]); });
+
+    function handleFiles(e){ const f = e.target.files?.[0]; if(f) setPreview(f); }
+    function aspectLabel(w,h){
+      if(!w||!h) return '(—)';
+      const ratio = (w/h).toFixed(2);
+      // Clasificación simple aproximada
+      if (Math.abs((9/16) - (w/h)) < 0.05) return '9:16 (vertical/Reel)';
+      if (Math.abs((4/5) - (w/h))  < 0.05) return '4:5 (vertical)';
+      if (Math.abs(1 - (w/h))      < 0.05) return '1:1 (cuadrado)';
+      if (Math.abs((16/9) - (w/h)) < 0.05) return '16:9 (horizontal)';
+      return `${w}×${h} (${ratio})`;
+    }
+    function setPreview(file){
+      const isImage = file.type.startsWith('image/');
+      const isVideo = file.type.startsWith('video/');
+      if(!isImage && !isVideo) return alert('Sube una imagen o video.');
+
+      // Limpia el contenedor
+      $drop.innerHTML = '';
+
+      if(isImage){
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(file);
+        img.onload = () => {
+          const r = aspectLabel(img.naturalWidth, img.naturalHeight);
+          $previewInfo.textContent = `Formato: Imagen ${r}`;
+        };
+        $drop.appendChild(img);
+        return;
+      }
+
+      if(isVideo){
+        const vid = document.createElement('video');
+        vid.src = URL.createObjectURL(file);
+        vid.controls = true;
+        vid.muted = true;
+        vid.playsInline = true;
+        vid.onloadedmetadata = () => {
+          const r = aspectLabel(vid.videoWidth, vid.videoHeight);
+          $previewInfo.textContent = `Formato: Video ${r}`;
+        };
+        $drop.appendChild(vid);
+        return;
+      }
+    }
+
+    $copy.addEventListener('input', updateMetrics);
+    $platform.addEventListener('change', updateContext);
+    $region.addEventListener('change', updateContext);
+    $time.addEventListener('input', updateContext);
+
+    // --------- Simulación de análisis (sin backend) ----------
+    function simulateScore({ text, platform, time }){
+      // Heurísticas simples para demo
+      let score = 50;
+      const len = text.length;
+      const words = countWords(text);
+      const hashes = countHashtags(text);
+      const read = readability(text);
+      const hasCTA = /comenta|guarda|comparte|descubre|regístrate|inscríbete|conoce|aprende|participa/iu.test(text);
+      const hasRef = /\[\d+\]|\(ref\.\s?\d+\)|https?:\/\/|doi\.org/i.test(text); // “referencias” muy básicas
+
+      // Longitud “ideal” por plataforma (demo)
+      const idealLen = { Instagram:[80,180], Facebook:[40,120], TikTok:[20,80], LinkedIn:[120,240], 'X (Twitter)':[40,200] }[platform] || [60,160];
+      if (len >= idealLen[0] && len <= idealLen[1]) score += 12; else score -= 6;
+
+      // Hashtags: 2–5 aprox
+      if (hashes >= 2 && hashes <= 5) score += 10; else if (hashes === 0) score -= 6; else score -= 3;
+
+      // Legibilidad
+      if (read === 'Alta') score += 8; else if (read === 'Baja') score -= 5;
+
+      // CTA claro
+      if (hasCTA) score += 8; else score -= 3;
+
+      // Hora sugerida (demo): 18:00–21:00 le suma un poco
+      const [h] = (time||'').split(':').map(n=>parseInt(n,10));
+      if (!isNaN(h) && h>=18 && h<=21) score += 6;
+
+      // Compliance: si detecta “referencias” suma (porque cuidas claims)
+      if (hasRef) score += 4;
+
+      // Normaliza
+      score = Math.max(1, Math.min(99, Math.round(score)));
+      return { score, words, hashes, read, ideal: idealLen, hasCTA, hasRef };
+    }
+
+    function simulatedAdvices(ctx){
+      const tips = [];
+      const checklist = [
+        'Ortografía y acentos revisados',
+        'Evita claims absolutos (“el mejor”, “cura”)',
+        'Si hay datos clínicos, agrega referencia visible',
+        'Texto alternativo (alt) para accesibilidad',
+        'Versión vertical 1080×1920 si es video corto'
+      ];
+      const [minL,maxL] = ctx.ideal;
+      if (ctx.hasCTA === false) tips.push('Agrega un CTA claro (ej. “Guarda este post para consultarlo después”).');
+      if (ctx.hashes < 2) tips.push('Añade 2–5 hashtags relevantes (evita genéricos).');
+      if (ctx.hashes > 5) tips.push('Reduce hashtags a 2–5 para no diluir el mensaje.');
+      if (ctx.read === 'Baja') tips.push('Simplifica frases: ideas cortas, un tema principal por párrafo.');
+      if (ctx.hasRef === false) tips.push('Si mencionas datos/estudios, incluye fuente o DOI (cumple compliance).');
+      if ($copy.value.length < minL) tips.push(`Tu copy es corto; apóyate de ${minL}-${maxL} caracteres aprox. para esta plataforma.`);
+      if ($copy.value.length > maxL) tips.push(`Tu copy es largo; intenta acercarlo a ${minL}-${maxL} caracteres.`);
+      return { tips, checklist };
+    }
+
+    document.getElementById('run').addEventListener('click', async ()=>{
+      updateContext();
+      updateMetrics();
+      $loading.style.display = 'inline-flex'; $run.disabled = true;
+
+      try{
+        // ==== Cuando tengas backend (Vercel) ====
+        // const res = await fetch('/api/agent', {
+        //   method:'POST', headers:{'Content-Type':'application/json'},
+        //   body: JSON.stringify({
+        //     mode:'calidad',
+        //     platform:$platform.value, region:$region.value, time:$time.value,
+        //     copy:$copy.value /* y más adelante la imagen como multipart/form-data */
+        //   })
+        // });
+        // const data = await res.json();
+
+        // ==== DEMO LOCAL ====
+        const ctx = simulateScore({ text:$copy.value, platform:$platform.value, time:$time.value });
+        $scoreFill.style.width = ctx.score + '%';
+        $scoreLabel.textContent = ctx.score + '%';
+
+        $lenKpi.textContent  = `${$copy.value.length} chars (ideal ${ctx.ideal[0]}–${ctx.ideal[1]})`;
+        $hashKpi.textContent = `${ctx.hashes} hashtags (2–5 ideal)`;
+        $readKpi.textContent = ctx.read;
+        $compKpi.textContent = ctx.hasRef ? 'Con referencias' : 'Sin referencias';
+
+        const { tips, checklist } = simulatedAdvices(ctx);
+        renderList($advices, tips.length ? tips : ['Se ve bien. Puedes publicar.']);
+        renderList($checklist, checklist);
+
+      }catch(e){
+        alert('No se pudo analizar el post. Intenta de nuevo.');
+        console.error(e);
+      }finally{
+        $loading.style.display = 'none'; $run.disabled = false;
+      }
+    });
+
+    // Estado inicial
+    updateContext(); updateMetrics();
+  </script>
+</body>
+</html>

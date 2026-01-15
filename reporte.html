@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lilly — Reporte general</title>
+  <meta name="description" content="Resumen consolidado de tendencias, conducta, calidad y parrilla." />
+  <meta name="color-scheme" content="light" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --lilly-red:#DF3024; --lilly-red-dark:#C1281E;
+      --bg-soft:#ffffff; --text:#313131; --white:#fff; --muted:rgba(35, 35, 35, 0.65);
+      --shadow:0 8px 24px rgba(0,0,0,.08); --radius:18px; --container:1120px;
+    }
+    *{ box-sizing:border-box }
+    html,body{ height:100% }
+    body{
+      margin:0; font-family:ui-sans-serif,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+      background:var(--bg-soft); color:var(--text); min-height:100vh; display:flex; flex-direction:column;
+      /* patrón punteado sutil como la landing */
+      background-image: radial-gradient(rgba(0,0,0,.12) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .wrap{ max-width:var(--container); margin:0 auto; padding:28px 20px 64px; flex:1; display:flex; flex-direction:column; gap:24px }
+    .topbar{
+      display:flex; align-items:center; justify-content:space-between; gap:16px;
+      margin-bottom:32px; padding-top:12px; width:100vw; padding:0 20px;
+    }
+    .topbar-inner{
+      width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 0;
+    }
+    .brand{ display:inline-flex; align-items:center; gap:12px; min-height:60px }
+    .brand img{ display:block; height:44px }
+    .brand-fallback{ font-family:"Georgia","Times New Roman",serif; font-size:35px; font-style:italic; color:var(--lilly-red) }
+    .title{
+      font-family:'Bebas Neue', sans-serif; font-weight:bold; letter-spacing:.5px; font-size:clamp(16px, 2.2vw, 24px);
+      color:#111; text-transform:uppercase; user-select:none;
+    }
+
+    .actions{ display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between }
+    .back{
+      display:inline-flex; align-items:center; gap:8px; background:#111; color:#fff;
+      border:0; border-radius:999px; padding:10px 16px; font-weight:800; text-decoration:none; box-shadow:var(--shadow);
+    }
+    .back:hover{ filter:brightness(1.1); }
+    .run{ background:#111; color:#fff; border:0; border-radius:14px; padding:12px 18px; font-weight:800; box-shadow:var(--shadow); cursor:pointer }
+    .run:hover{ filter:brightness(1.1); }
+
+    .grid{ display:grid; grid-template-columns:1fr 1fr; gap:20px }
+    .full{ grid-column:1 / -1 }
+    .card{ background:var(--white); border-radius:12px; box-shadow:0 12px 24px rgba(0,0,0,.15); padding:18px }
+    .card h2{ margin:0 0 10px; font-size:22px; color:#111; font-family:'Bebas Neue', sans-serif; letter-spacing:.3px; text-transform:uppercase }
+    .muted{ color:var(--muted); font-size:13px }
+    ul{ margin:10px 0 0 18px } li{ margin:6px 0 }
+
+    .kpis{ display:grid; grid-template-columns:1fr 1fr; gap:10px }
+    .kpi{ background:#fff; border-radius:12px; padding:10px 12px; box-shadow:var(--shadow); display:flex; justify-content:space-between; align-items:center }
+
+    footer{ position:fixed; bottom:0; left:0; width:100%; background:var(--bg-soft); text-align:center; padding:10px 0; font-size:12px; color:rgba(122,20,15,.7); user-select:none; box-shadow:0 -2px 6px rgba(0,0,0,.06) }
+    footer p{ font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:12px; color:#111; opacity:.7; text-align:center }
+
+    @media (max-width:1000px){ .grid{ grid-template-columns:1fr } .kpis{ grid-template-columns:1fr } }
+
+    /* ===== Estilos de impresión (PDF) ===== */
+    @media print{
+      body{ background:#fff; color:#000 }
+      .actions, .back{ display:none !important }
+      .wrap{ padding:0 12mm }
+      .card{ box-shadow:none; border:1px solid #ddd }
+      .title{ color:#000 }
+      .card h2{ color:#000 }
+      a{ color:#000; text-decoration:none }
+      .grid{ gap:12px }
+      footer{ display:none !important }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="Barra superior">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Lilly">
+        <img src="assets/lilly-logo.svg" alt="Lilly"
+             onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="brand-fallback" style="display:none">Lilly</span>
+      </div>
+      <h1 class="title">SOCIAL MEDIA TOOLS BY HOOD.</h1>
+    </div>
+  </header>
+  <main class="wrap" role="main">
+    <div class="actions">
+      <a class="back" href="index.html">⟵ Volver</a>
+      <div style="display:flex; gap:10px; flex-wrap:wrap">
+        <button id="gather" class="run" type="button">Recopilar datos</button>
+        <button id="download" class="run" type="button">Descargar PDF</button>
+      </div>
+    </div>
+
+    <section class="grid" id="report">
+      <!-- Tendencias -->
+      <article class="card">
+        <h2>Tendencias — últimos <span id="r_days">30</span> días</h2>
+        <p class="muted" id="r_tend_ctx">Plataforma: Todas • Región: México</p>
+        <ul id="r_tend_list">
+          <li>—</li><li>—</li><li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Pronóstico -->
+      <article class="card">
+        <h2>Pronóstico — próximo mes</h2>
+        <p class="muted">Temas y formatos con probabilidad de crecimiento</p>
+        <ul id="r_forecast_list">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Conducta -->
+      <article class="card">
+        <h2>Conducta de algoritmos</h2>
+        <p class="muted" id="r_cond_ctx">Plataforma: Instagram • Región: México</p>
+        <ul id="r_cond_changes">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Buenas prácticas -->
+      <article class="card">
+        <h2>Buenas prácticas actuales</h2>
+        <ul id="r_cond_best">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Calidad -->
+      <article class="card">
+        <h2>Calidad y performance</h2>
+        <div class="kpis">
+          <div class="kpi"><span>Score</span><strong id="r_score">—%</strong></div>
+          <div class="kpi"><span>Legibilidad</span><strong id="r_read">—</strong></div>
+          <div class="kpi"><span>Hashtags</span><strong id="r_hash">—</strong></div>
+          <div class="kpi"><span>Longitud</span><strong id="r_len">—</strong></div>
+        </div>
+      </article>
+
+      <!-- Recomendaciones de calidad -->
+      <article class="card">
+        <h2>Recomendaciones de calidad</h2>
+        <ul id="r_advices">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </article>
+
+      <!-- Parrilla -->
+      <article class="card full">
+        <h2>Parrilla semanal (resumen)</h2>
+        <ul id="r_parrilla">
+          <li>—</li>
+        </ul>
+      </article>
+    </section>
+  </main>
+
+  <footer><p>© 2025 Social Media Tools by Hood. All Rights Reserved.</p></footer>
+
+  <script>
+    // Helpers
+    function renderList(el, arr){
+      el.innerHTML = '';
+      arr.forEach(t => { const li = document.createElement('li'); li.textContent = t; el.appendChild(li); });
+    }
+    function getLS(key, fallback){ try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }catch{ return fallback; } }
+
+    // Botón: Descargar PDF
+    document.getElementById('download').addEventListener('click', () => window.print());
+
+    // Botón: Recopilar datos (lee localStorage si existe; si no, usa placeholders)
+    document.getElementById('gather').addEventListener('click', () => {
+      // ---- Tendencias (tendencias.html podría guardar estos keys) ----
+      const tendDays   = getLS('tend_days', 30);
+      const tendCtx    = getLS('tend_ctx', { platform:'Todas', region:'México' });
+      const tendList   = getLS('tend_top5', [
+        'Crecimiento de Reels/Shorts (+engagement por tutoriales rápidos)',
+        'Contenido UGC/médicos-creadores gana confianza en la región',
+        'Carruseles educacionales: guarda/compartir ↑',
+        'Lives con Q&A clínico: 15–20 min funcionan mejor',
+        'Hashtags específicos superan genéricos'
+      ]);
+      const forecast   = getLS('tend_forecast', [
+        'Auge de “antes/después” con datos (con referencias)',
+        'Micro-historias de pacientes (cumpliendo compliance)',
+        'Subtítulos/overlays con keywords médicas'
+      ]);
+
+      document.getElementById('r_days').textContent = tendDays;
+      document.getElementById('r_tend_ctx').textContent = `Plataforma: ${tendCtx.platform} • Región: ${tendCtx.region}`;
+      renderList(document.getElementById('r_tend_list'), tendList);
+      renderList(document.getElementById('r_forecast_list'), forecast);
+
+      // ---- Conducta (conducta.html podría guardar estos keys) ----
+      const condCtx    = getLS('cond_ctx', { platform:'Instagram', region:'México' });
+      const condChg    = getLS('cond_changes', [
+        'Prioriza retención (>3s) y tiempo de visualización',
+        'Señales de “guardar” y “compartir” pesan más que likes',
+        'Variedad de formatos favorece distribución'
+      ]);
+      const condBest   = getLS('cond_best', [
+        'Hook en 1–2s con palabras clave del tema',
+        'CTA único y claro (comentar o guardar)',
+        'Subtítulos legibles; 9:16 en video corto'
+      ]);
+
+      document.getElementById('r_cond_ctx').textContent = `Plataforma: ${condCtx.platform} • Región: ${condCtx.region}`;
+      renderList(document.getElementById('r_cond_changes'), condChg);
+      renderList(document.getElementById('r_cond_best'), condBest);
+
+      // ---- Calidad (calidad.html podría guardar estos keys) ----
+      const calScore   = getLS('cal_score', 78);
+      const calRead    = getLS('cal_read', 'Alta');
+      const calHash    = getLS('cal_hash', '3 (ideal 2–5)');
+      const calLen     = getLS('cal_len', '120 chars (ideal 80–180)');
+      const calAdv     = getLS('cal_advices', [
+        'Agrega 2–5 hashtags relevantes',
+        'Incluye referencias si citas datos/estudios',
+        'Hook claro al inicio del texto'
+      ]);
+
+      document.getElementById('r_score').textContent = `${calScore}%`;
+      document.getElementById('r_read').textContent  = calRead;
+      document.getElementById('r_hash').textContent  = calHash;
+      document.getElementById('r_len').textContent   = calLen;
+      renderList(document.getElementById('r_advices'), calAdv);
+
+      // ---- Parrilla (parrilla.html podría guardar estos keys) ----
+      const parrilla   = getLS('parrilla_week', {
+        Lunes: ['—'], Martes: ['—'], Miércoles: ['—'], Jueves: ['—'], Viernes: ['—'], Sábado: ['—'], Domingo: ['—']
+      });
+
+      // Convierte el objeto a una lista legible
+      const out = [];
+      Object.keys(parrilla).forEach(dia => {
+        const items = parrilla[dia] && parrilla[dia].length ? parrilla[dia].join(' • ') : '—';
+        out.push(`${dia}: ${items}`);
+      });
+      renderList(document.getElementById('r_parrilla'), out);
+    });
+
+    // Estado inicial: deja placeholders. El usuario puede pulsar “Recopilar datos”.
+  </script>
+</body>
+</html>

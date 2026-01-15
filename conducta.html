@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lilly — Conducta de algoritmos</title>
+  <meta name="description" content="Conducta de algoritmos por plataforma y región." />
+  <meta name="color-scheme" content="light" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --lilly-red: #DF3024;
+      --lilly-red-dark: #C1281E;
+      --bg-soft: #ffffff;
+      --text: #383838;
+      --white: #ffffff;
+      --muted: rgba(49, 49, 49, 0.65);
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 18px;
+      --radius-lg: 22px;
+      --container: 1120px;
+    }
+    *{ box-sizing: border-box; }
+    html,body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: var(--bg-soft);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: radial-gradient(rgba(0,0,0,.12) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+    .wrap{
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:32px; padding-top:12px; width:100vw; padding:0 20px; }
+    .topbar-inner{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
+    .brand{
+      display: inline-flex; align-items: center; gap: 12px; min-height: 60px;
+    }
+    .brand img{ display: block; height: 44px; }
+    .brand-fallback{
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 35px; font-style: italic; color: var(--lilly-red);
+      text-shadow: 0 2px 0 rgba(0,0,0,.05); user-select: none;
+    }
+    .title{
+      font-family:'Bebas Neue', sans-serif; font-weight:bold; letter-spacing:.5px; font-size:clamp(16px, 2.2vw, 24px); color:#111; text-transform:uppercase; user-select:none;
+    }
+
+    .actions{
+      display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+      justify-content: space-between; margin: 8px 0 12px;
+    }
+    .back{ display:inline-flex; align-items:center; gap:8px; background:#111; color:#fff; border:0; border-radius:999px; padding:10px 16px; font-weight:800; cursor:pointer; box-shadow:var(--shadow); text-decoration:none; }
+    .back:hover{ filter:brightness(1.1); }
+    .filters{
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    }
+    .select{
+      background: var(--white); border: 1.5px solid rgba(0,0,0,.08);
+      border-radius: 12px; padding: 10px 12px; min-height: 40px;
+      box-shadow: var(--shadow); color: var(--text);
+    }
+    .run{ background:#111; color:#fff; border:0; border-radius:14px; padding:12px 18px; font-weight:800; cursor:pointer; box-shadow:var(--shadow); }
+    .run:hover{ filter:brightness(1.1); }
+
+    .grid{
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+    }
+    .card{ background:var(--white); border-radius:12px; box-shadow:0 12px 24px rgba(0,0,0,.15); padding:18px; }
+    .card h2{ margin:0 0 10px; font-size:22px; color:#111; font-family:'Bebas Neue', sans-serif; letter-spacing:.3px; text-transform:uppercase; }
+    .muted{ color: var(--muted); font-size: 13px; }
+
+    ul{ margin: 10px 0 0 18px; }
+    li{ margin: 6px 0; }
+
+    .loading{
+      display: none; align-items: center; gap: 10px; color: var(--muted);
+      font-weight: 600;
+    }
+    .dot{ width: 8px; height: 8px; border-radius: 50%;
+      background: var(--lilly-red); animation: pulse 1s infinite ease-in-out;
+    }
+    .dot:nth-child(2){ animation-delay: .2s; }
+    .dot:nth-child(3){ animation-delay: .4s; }
+    @keyframes pulse{ 0%,100%{ transform: scale(.7); opacity:.6 } 50%{ transform: scale(1); opacity:1 } }
+
+    footer{ position:fixed; bottom:0; left:0; width:100%; background:var(--bg-soft); text-align:center; padding:10px 0; font-size:12px; color:rgba(122,20,15,.7); user-select:none; box-shadow:0 -2px 6px rgba(0,0,0,.06); }
+    footer p{ font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:12px; color:#111; opacity:.7; text-align:center; }
+
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar" aria-label="Barra superior">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Lilly">
+        <img src="assets/lilly-logo.svg" alt="Lilly" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="brand-fallback" style="display:none">Lilly</span>
+      </div>
+      <h1 class="title">SOCIAL MEDIA TOOLS BY HOOD.</h1>
+    </div>
+  </header>
+  <main class="wrap" role="main">
+
+    <div class="actions">
+      <!-- Nota: apunta a intex.html para coincidir con tu archivo actual -->
+      <a class="back" href="index.html" aria-label="Volver al inicio">⟵ Volver</a>
+
+      <div class="filters" role="group" aria-label="Filtros">
+        <select id="platform" class="select" aria-label="Plataforma">
+          <option value="Instagram">Instagram</option>
+          <option value="Facebook">Facebook</option>
+          <option value="TikTok">TikTok</option>
+          <option value="LinkedIn">LinkedIn</option>
+          <option value="X">X (Twitter)</option>
+        </select>
+
+        <select id="region" class="select" aria-label="Región">
+          <option value="MX">México</option>
+          <option value="LATAM">LATAM</option>
+          <option value="Global">Global</option>
+        </select>
+
+        <button id="run" class="run">Actualizar conducta</button>
+      </div>
+    </div>
+
+    <div id="loading" class="loading" aria-live="polite">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+      Consultando cambios y mejores prácticas…
+    </div>
+
+    <section class="grid" aria-label="Resultados">
+      <article class="card">
+        <h2>Cambios recientes del algoritmo</h2>
+        <p class="muted" id="contextLabel">Plataforma: Instagram • Región: México</p>
+        <ul id="listChanges">
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Buenas prácticas actuales</h2>
+        <p class="muted">Recomendaciones específicas por plataforma</p>
+        <ul id="listBestPractices">
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Riesgos / Flags de compliance</h2>
+        <p class="muted">Puntos a vigilar en farma (copys, claims, referencias)</p>
+        <ul id="listCompliance">
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Checklist por formato</h2>
+        <p class="muted">Reels, Carrusel, Estático, Live</p>
+        <ul id="listChecklist">
+          <li>—</li>
+          <li>—</li>
+          <li>—</li>
+        </ul>
+      </article>
+    </section>
+
+    <footer><p>© 2025 Social Media Tools by Hood. All Rights Reserved.</p></footer>
+  </main>
+
+  <script>
+    const $platform = document.getElementById('platform');
+    const $region   = document.getElementById('region');
+    const $run      = document.getElementById('run');
+    const $loading  = document.getElementById('loading');
+
+    const $contextLabel    = document.getElementById('contextLabel');
+    const $listChanges     = document.getElementById('listChanges');
+    const $listBest        = document.getElementById('listBestPractices');
+    const $listCompliance  = document.getElementById('listCompliance');
+    const $listChecklist   = document.getElementById('listChecklist');
+
+    function renderList(el, items){
+      el.innerHTML = '';
+      items.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        el.appendChild(li);
+      });
+    }
+
+    function updateContext(){
+      $contextLabel.textContent = `Plataforma: ${$platform.value} • Región: ${$region.value}`;
+    }
+
+    // Simulación local de resultados (placeholder)
+    async function simulateConducta({ platform, region }){
+      await new Promise(r => setTimeout(r, 900)); // pequeño delay
+      const changes = [
+        `${platform}: prioriza retención (>3s) y tiempo de visualización`,
+        `${platform}: señales de “guardar” y “compartir” pesan más que likes`,
+        `${platform}: variedad de formatos favorece distribución (no repetir solo uno)`
+      ];
+      const best = [
+        `Hook en 1–2s, textos sobre el video con keywords del tema`,
+        `CTA claro y una sola intención (comentar o guardar, no ambas)`,
+        `Subtítulos/overlays legibles; relación 9:16 en video corto`
+      ];
+      const compliance = [
+        `Evitar claims terapéuticos no sustentados; usar referencias visibles`,
+        `Si hay comparativos, indicar fuente y año; evitar absolutismos`,
+        `Aprobación interna (Medical/Legal/Regulatory) antes de pautar`
+      ];
+      const checklist = [
+        `Reels: inicio potente + ritmo dinámico + subtítulos`,
+        `Carrusel: 6–8 slides; valor en cada lámina (datos, tips, fuentes)`,
+        `Estático: foco en un solo mensaje; copy corto y claro`
+      ];
+      return { changes, best, compliance, checklist };
+    }
+
+    $platform.addEventListener('change', updateContext);
+    $region.addEventListener('change', updateContext);
+
+    $run.addEventListener('click', async () => {
+      updateContext();
+      $loading.style.display = 'inline-flex';
+      $run.disabled = true;
+
+      try {
+        // ==== FUTURO: llamado real ====
+        // const res = await fetch('/api/agent', {
+        //   method: 'POST',
+        //   headers: { 'Content-Type': 'application/json' },
+        //   body: JSON.stringify({ mode: 'conducta', platform: $platform.value, region: $region.value })
+        // });
+        // const data = await res.json();
+
+        // ==== DEMO LOCAL ====
+        const data = await simulateConducta({ platform: $platform.value, region: $region.value });
+
+        renderList($listChanges, data.changes);
+        renderList($listBest, data.best);
+        renderList($listCompliance, data.compliance);
+        renderList($listChecklist, data.checklist);
+
+      } catch (e) {
+        alert('No se pudo actualizar la conducta. Intenta de nuevo.');
+        console.error(e);
+      } finally {
+        $loading.style.display = 'none';
+        $run.disabled = false;
+      }
+    });
+
+    // Estado inicial
+    updateContext();
+  </script>
+</body>
+</html>

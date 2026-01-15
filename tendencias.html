@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Buscador de tendencias</title>
+  <link rel="icon" href="/assets/lilly-logo.svg" />
+  <style>
+    :root{
+      --bg:#ffffff; --fg:#0f0f0f; --muted:#6b7280; --card:#ffffff;
+      --radius:20px; --shadow:0 10px 30px rgba(0,0,0,.12);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+      Roboto, "Helvetica Neue", Arial; color:var(--fg); background:var(--bg);
+      background-image: radial-gradient(#dcdcdc 1px, transparent 1px);
+      background-size: 18px 18px;
+      /* espacio para el header fijo global */
+      padding-top: 88px;
+    }
+
+    /* ===== Header GLOBAL (igual al index) ===== */
+    .site-header{
+      position: fixed;
+      top: 18px; left: 20px; right: 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      z-index: 50;
+      pointer-events: none; /* el header no tapa los controles de abajo */
+    }
+    .site-header a, .site-header div{ pointer-events: auto; }
+    .site-logo{ display:inline-flex; align-items:center; gap:10px; text-decoration:none }
+    .site-logo img{ height: 28px; display:block }
+    .site-brand{
+      font-size: 14px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase;
+      opacity: .9;
+    }
+
+    /* ===== Contenido de la página ===== */
+    .wrap{max-width:1200px; margin:40px auto 80px; padding:0 20px}
+
+    /* header local renombrado para no chocar con el global */
+    .page-header{display:flex; gap:16px; align-items:center; flex-wrap:wrap; position:sticky; top:16px; z-index:10}
+    .back{
+      display:inline-flex; align-items:center; gap:8px; padding:14px 20px;
+      border-radius:50px; background:#111; color:#fff; font-weight:800;
+      text-decoration:none; box-shadow:var(--shadow);
+    }
+    .controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-left:auto}
+    .input, select{
+      padding:14px 16px; border:1px solid #e5e7eb; border-radius:14px;
+      background:#fff; font-weight:600; min-width:180px;
+    }
+    .btn{
+      padding:14px 22px; border-radius:14px; border:0; color:#fff; background:#111;
+      font-weight:800; cursor:pointer; box-shadow:var(--shadow);
+    }
+    .btn[disabled]{opacity:.6; cursor:default}
+    main{display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:32px}
+    @media (max-width: 960px){ main{grid-template-columns:1fr} }
+    .card{
+      background:var(--card); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow)
+    }
+    h2{margin:0 0 10px; font-size:28px}
+    .sub{color:var(--muted); margin:0 0 16px; font-weight:600}
+    ul{margin:10px 0 0 0; padding-left:20px}
+    li{margin:10px 0; line-height:1.4}
+    .brand{position:fixed; right:22px; bottom:18px; opacity:.6; font-size:12px; font-weight:800; letter-spacing:.03em}
+    .loading-dot{display:none; margin-left:10px}
+  </style>
+</head>
+<body>
+
+  <!-- Header GLOBAL (estará en todas las páginas si lo copias igual) -->
+  <div class="site-header">
+    <a class="site-logo" href="/index.html" aria-label="Inicio">
+      <img src="/assets/lilly-logo.svg" alt="Lilly" />
+    </a>
+    <div class="site-brand">SOCIAL MEDIA TOOLS BY HOOD.</div>
+  </div>
+
+  <div class="wrap">
+    <!-- Header local de esta página (volver + filtros) -->
+    <div class="page-header">
+      <a class="back" href="/index.html">← Volver</a>
+
+      <div class="controls">
+        <select id="platform" class="input" aria-label="Plataforma">
+          <option value="all" selected>Todas las plataformas</option>
+          <option value="instagram">Instagram</option>
+          <option value="tiktok">TikTok</option>
+          <option value="facebook">Facebook</option>
+          <option value="x">X (Twitter)</option>
+          <option value="youtube">YouTube</option>
+          <option value="linkedin">LinkedIn</option>
+        </select>
+
+        <select id="region" class="input" aria-label="Región">
+          <option value="MX" selected>México</option>
+          <option value="LATAM">LatAm</option>
+          <option value="US">Estados Unidos</option>
+          <option value="ES">España</option>
+          <option value="GLOBAL">Global</option>
+        </select>
+
+        <select id="days" class="input" aria-label="Días">
+          <option value="7">7</option>
+          <option value="14">14</option>
+          <option value="30" selected>30</option>
+          <option value="60">60</option>
+          <option value="90">90</option>
+        </select>
+
+        <!-- Si quieres tema específico, descomenta:
+        <input id="topic" class="input" placeholder="Tema o categoría (opcional)">
+        -->
+
+        <button id="run" class="btn">
+          Generar reporte
+          <span id="loading" class="loading-dot">• • •</span>
+        </button>
+      </div>
+    </div>
+
+    <main>
+      <section class="card">
+        <h2>REPORTE DE TENDENCIAS (ÚLTIMOS <span id="days-label">30</span> DÍAS)</h2>
+        <p id="context-label" class="sub">Plataforma: all • Región: MX</p>
+        <ul id="list-trends">
+          <li>—</li><li>—</li><li>—</li><li>—</li><li>—</li>
+        </ul>
+      </section>
+
+      <section class="card">
+        <h2>PRONÓSTICO (PRÓXIMO MES)</h2>
+        <p class="sub">Temas y formatos con probabilidad de crecimiento</p>
+        <ul id="list-forecast">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+      </section>
+    </main>
+  </div>
+
+  <div class="brand">SOCIAL MEDIA TOOLS BY HOOD.</div>
+
+  <script>
+    // --- DOM refs
+    const $platform     = document.getElementById('platform');
+    const $region       = document.getElementById('region');
+    const $days         = document.getElementById('days');
+    const $run          = document.getElementById('run');
+    const $loading      = document.getElementById('loading');
+    const $listTrends   = document.getElementById('list-trends');
+    const $listForecast = document.getElementById('list-forecast');
+    const $contextLabel = document.getElementById('context-label');
+    const $daysLabel    = document.getElementById('days-label');
+    // const $topic     = document.getElementById('topic'); // si lo usas
+
+    // --- helpers
+    function renderList(ul, items){
+      ul.innerHTML = '';
+      if(!items || !items.length){
+        ul.innerHTML = '<li>No se encontraron señales claras.</li>';
+        return;
+      }
+      items.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = t;
+        ul.appendChild(li);
+      });
+    }
+
+    function updateContextLabel(){
+      $contextLabel.textContent = `Plataforma: ${$platform.value} • Región: ${$region.value}`;
+      $daysLabel.textContent = String($days.value || 30);
+    }
+
+    // --- UI bindings
+    ['change','input'].forEach(evt => {
+      $platform.addEventListener(evt, updateContextLabel);
+      $region.addEventListener(evt, updateContextLabel);
+      $days.addEventListener(evt, updateContextLabel);
+    });
+    updateContextLabel();
+
+    // --- Acción principal: llamar a /api/chat
+    $run.addEventListener('click', async () => {
+      updateContextLabel();
+      $loading.style.display = 'inline';
+      $run.disabled = true;
+
+      try {
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            mode: 'tendencias',
+            platform: $platform.value,
+            region: $region.value,
+            days: Number($days.value || 30),
+            // topic: ($topic?.value || '')
+          })
+        });
+
+        const data = await res.json();
+        if(!res.ok) throw new Error(data?.error || 'Error en la API');
+
+        renderList($listTrends, data.top5 || []);
+        renderList($listForecast, data.forecast || []);
+      } catch (err) {
+        console.error(err);
+        alert('Error al generar el reporte. Revisa la consola y vuelve a intentar.');
+      } finally {
+        $loading.style.display = 'none';
+        $run.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

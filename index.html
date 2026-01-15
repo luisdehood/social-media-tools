@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es-MX">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lilly — Social Media Tools</title>
+  <meta name="description" content="Landing minimalista para agente especialista en Social Media de Lilly." />
+  <meta name="color-scheme" content="light" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    /* ===========================
+       Variables de estilo (paleta Lilly)
+       =========================== */
+    :root{
+      --lilly-red: #DF3024;      /* rojo botones */
+      --lilly-red-dark: #C1281E; /* hover */
+      --bg-soft: #ffffff;        /* fondo rosado suave */
+      --text: #7A140F;           /* rojo vino para títulos */
+      --white: #ffffff;
+      --shadow: 0 8px 24px rgba(0,0,0,.08);
+      --radius: 18px;
+      --radius-lg: 22px;
+      --container: 1120px;       /* ancho máximo del contenido */
+    }
+
+    /* Reset suave y tipografía del sistema (sin dependencias externas) */
+    *{ box-sizing: border-box; }
+    html,body{ height: 100%; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      background: var(--bg-soft);
+      color: var(--text);
+      /* Patrón punteado tipo grid */
+      background-image: radial-gradient(rgba(0,0,0,.12) 1px, transparent 1px);
+      background-size: 20px 20px;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .buttons-wrap{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      margin-top:150px;
+    }
+
+    /* Contenedor principal centrado */
+    .wrap{
+      max-width: var(--container);
+      margin: 0 auto;
+      padding: 28px 0 64px;
+      width: 100%;
+    }
+
+    /* Header con “Lilly” a la izquierda y “Social Media Tools” a la derecha */
+    .topbar{
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 32px;
+      padding-top: 12px;
+      width: 100vw;
+      padding: 0 20px;
+    }
+    .topbar-inner{
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 0;
+    }
+
+    /* Marca: usa imagen si existe, si no, cae al texto “Lilly” */
+    .brand{
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 60px;
+    }
+    .brand img{
+      display: block;
+      height: 44px;
+    }
+    .brand-fallback{
+      font-family: "Georgia", "Times New Roman", serif;
+      font-size: 35px;
+      font-style: italic;
+      color: var(--lilly-red);
+      text-shadow: 0 2px 0 rgba(0,0,0,.05);
+      user-select: none;
+    }
+
+    .title{
+      font-family: 'Bebas Neue', sans-serif;
+      font-weight: bold;
+      letter-spacing: .5px;
+      font-size: clamp(16px, 2.2vw, 24px);
+      color: #111;
+      text-transform: uppercase;
+      user-select: none;
+    }
+
+    /* --- Botones como imágenes (cards PNG) --- */
+    .cards{
+      display: grid;
+      grid-template-columns: repeat(4, minmax(280px, 1fr));
+      gap: 32px;
+      justify-items: center;
+      align-items: start;
+      margin: 40px auto 24px;
+      width: 100%;
+      max-width: 1120px;
+    }
+    .image-btn{
+      background: none;
+      border: none;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      display: inline-block;
+      filter: drop-shadow(0 8px 18px rgba(0,0,0,.18));
+      transition: transform .08s ease, filter .12s ease;
+    }
+    .image-btn:hover{ transform: translateY(-2px); filter: drop-shadow(0 12px 22px rgba(0,0,0,.22)); }
+    .image-btn:active{ transform: translateY(0); }
+    .image-btn img{
+      display: block;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 12px;
+    }
+    .report-cta{
+      display: flex;
+      justify-content: center;
+      margin: 28px 0 0;
+    }
+
+    footer{
+      margin-top:auto;
+      text-align:center;
+      width:100%;
+    }
+
+    @media (max-width: 1200px){
+      .cards{ grid-template-columns: repeat(2, minmax(240px, 1fr)); }
+    }
+    @media (max-width: 640px){
+      .cards{ grid-template-columns: 1fr; gap: 18px; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar" aria-label="Barra superior">
+    <div class="topbar-inner">
+      <div class="brand" aria-label="Lilly">
+        <!-- Si tienes el archivo de logo, colócalo en /assets/lilly-logo.svg y se mostrará -->
+        <img src="assets/lilly-logo.svg" alt="Lilly" onerror="this.style.display='none'; this.nextElementSibling.style.display='inline-block';" />
+        <span class="brand-fallback" style="display:none">Lilly</span>
+      </div>
+
+      <h1 class="title">SOCIAL MEDIA TOOLS BY HOOD.</h1>
+    </div>
+  </header>
+
+  <main class="wrap" role="main">
+    <div class="buttons-wrap">
+      <div class="cards" aria-label="Acciones principales">
+        <button class="image-btn" id="btn-tendencias" aria-label="Buscador de tendencias">
+          <img src="assets/btn-tendencias.png" alt="Buscador de tendencias" />
+        </button>
+
+        <button class="image-btn" id="btn-conducta" aria-label="Conducta de algoritmos">
+          <img src="assets/btn-conducta.png" alt="Conducta de algoritmos" />
+        </button>
+
+        <button class="image-btn" id="btn-calidad" aria-label="Calidad y performance">
+          <img src="assets/btn-calidad.png" alt="Calidad y performance" />
+        </button>
+
+        <button class="image-btn" id="btn-parrilla" aria-label="Optimizador de parrilla">
+          <img src="assets/btn-parrilla.png" alt="Optimizador de parrilla" />
+        </button>
+      </div>
+
+      <div class="report-cta">
+        <button class="image-btn" id="btn-reporte" aria-label="Reporte general">
+          <img src="assets/btn-reporte-general.png" alt="Reporte general" />
+        </button>
+      </div>
+    </div>
+
+  
+  </main>
+
+  <footer>
+    <p style="font-family:'Helvetica Neue',Arial,sans-serif; font-weight:700; letter-spacing:.5px; text-transform:uppercase; font-size:12px; color:#111; opacity:.7; text-align:center; margin-top:40px;">
+      © 2025 Social Media Tools by Hood. All Rights Reserved.
+    </p>
+  </footer>
+
+  <script>
+    // ===========================
+    // JS mínimo: “placeholders” de click
+    // Más adelante, estos botones navegarán a páginas reales o abrirán modales.
+    // ===========================
+    const nav = {
+      tendencias: () => { location.href = "tendencias.html"; },
+      conducta: () => { location.href = "conducta.html"; },
+      calidad: () => { location.href = "calidad.html"; },
+      parrilla:   () => { location.href = "parrilla.html"; },
+      reporte:    () => { location.href = "reporte.html"; },
+    };
+
+    document.getElementById("btn-tendencias")?.addEventListener("click", nav.tendencias);
+    document.getElementById("btn-conducta")?.addEventListener("click", nav.conducta);
+    document.getElementById("btn-calidad")?.addEventListener("click", nav.calidad);
+    document.getElementById("btn-parrilla")?.addEventListener("click", nav.parrilla);
+    document.getElementById("btn-reporte")?.addEventListener("click", nav.reporte);
+
+    // Si prefieres que cada botón vaya a una página,
+    // reemplaza los alert() por: location.href = "ruta/archivo.html";
+  </script>
+</body>
+</html>
