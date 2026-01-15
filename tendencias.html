@@ -3,8 +3,12 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Buscador de tendencias</title>
+  <title>Reporte de tendencias — Lilly México</title>
   <link rel="icon" href="/assets/lilly-logo.svg" />
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
   <style>
     :root{
       --bg:#ffffff; --fg:#0f0f0f; --muted:#6b7280; --card:#ffffff;
@@ -16,17 +20,16 @@
       Roboto, "Helvetica Neue", Arial; color:var(--fg); background:var(--bg);
       background-image: radial-gradient(#dcdcdc 1px, transparent 1px);
       background-size: 18px 18px;
-      /* espacio para el header fijo global */
       padding-top: 88px;
     }
 
-    /* ===== Header GLOBAL (igual al index) ===== */
+    /* ===== Header GLOBAL ===== */
     .site-header{
       position: fixed;
       top: 18px; left: 20px; right: 20px;
       display: flex; align-items: center; justify-content: space-between;
       z-index: 50;
-      pointer-events: none; /* el header no tapa los controles de abajo */
+      pointer-events: none;
     }
     .site-header a, .site-header div{ pointer-events: auto; }
     .site-logo{ display:inline-flex; align-items:center; gap:10px; text-decoration:none }
@@ -36,42 +39,106 @@
       opacity: .9;
     }
 
-    /* ===== Contenido de la página ===== */
     .wrap{max-width:1200px; margin:40px auto 80px; padding:0 20px}
 
-    /* header local renombrado para no chocar con el global */
-    .page-header{display:flex; gap:16px; align-items:center; flex-wrap:wrap; position:sticky; top:16px; z-index:10}
+    .page-header{
+      display:flex; gap:16px; align-items:center; flex-wrap:wrap;
+      position:sticky; top:16px; z-index:10;
+    }
     .back{
       display:inline-flex; align-items:center; gap:8px; padding:14px 20px;
       border-radius:50px; background:#111; color:#fff; font-weight:800;
       text-decoration:none; box-shadow:var(--shadow);
     }
     .controls{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-left:auto}
-    .input, select{
-      padding:14px 16px; border:1px solid #e5e7eb; border-radius:14px;
-      background:#fff; font-weight:600; min-width:180px;
-    }
     .btn{
       padding:14px 22px; border-radius:14px; border:0; color:#fff; background:#111;
       font-weight:800; cursor:pointer; box-shadow:var(--shadow);
     }
+    .btn.secondary{
+      background:#fff; color:#111; border:1px solid #e5e7eb;
+    }
     .btn[disabled]{opacity:.6; cursor:default}
+
+    .loading-dot{display:none; margin-left:10px}
+
     main{display:grid; grid-template-columns:1fr 1fr; gap:28px; margin-top:32px}
     @media (max-width: 960px){ main{grid-template-columns:1fr} }
+
     .card{
       background:var(--card); border-radius:var(--radius); padding:28px; box-shadow:var(--shadow)
     }
     h2{margin:0 0 10px; font-size:28px}
+    h3{margin:0 0 8px; font-size:18px}
     .sub{color:var(--muted); margin:0 0 16px; font-weight:600}
     ul{margin:10px 0 0 0; padding-left:20px}
     li{margin:10px 0; line-height:1.4}
+
+    .full{ grid-column: 1 / -1; }
+    .grid-2{ display:grid; grid-template-columns:1fr 1fr; gap: 18px; }
+    @media (max-width: 960px){ .grid-2{ grid-template-columns:1fr; } }
+
+    .table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+      border: 1px solid #e5e7eb;
+    }
+    .table th, .table td{
+      text-align:left;
+      padding: 12px 12px;
+      vertical-align: top;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .table th{
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      color: #111;
+      background: #fafafa;
+    }
+    .pill{
+      display:inline-block;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #e5e7eb;
+      font-size: 12px;
+      font-weight: 800;
+      color: #111;
+      background: #fff;
+      white-space: nowrap;
+    }
+
     .brand{position:fixed; right:22px; bottom:18px; opacity:.6; font-size:12px; font-weight:800; letter-spacing:.03em}
-    .loading-dot{display:none; margin-left:10px}
+
+    a.clean-link{
+      color:#111;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+    }
+
+    /* ===== PRINT (PDF) ===== */
+    @media print {
+      body{
+        background: #fff !important;
+        background-image: none !important;
+        padding-top: 0 !important;
+      }
+      .site-header, .page-header, .brand{ display:none !important; }
+      .wrap{ margin: 0 !important; padding: 0 12mm !important; }
+      .card{ box-shadow: none !important; border: 1px solid #e5e7eb !important; }
+      main{ gap: 14px !important; }
+      .no-break{ break-inside: avoid; page-break-inside: avoid; }
+      canvas{ max-height: 240px !important; }
+    }
   </style>
 </head>
-<body>
 
-  <!-- Header GLOBAL (estará en todas las páginas si lo copias igual) -->
+<body>
+  <!-- Header GLOBAL -->
   <div class="site-header">
     <a class="site-logo" href="/index.html" aria-label="Inicio">
       <img src="/assets/lilly-logo.svg" alt="Lilly" />
@@ -80,62 +147,94 @@
   </div>
 
   <div class="wrap">
-    <!-- Header local de esta página (volver + filtros) -->
     <div class="page-header">
       <a class="back" href="/index.html">← Volver</a>
 
       <div class="controls">
-        <select id="platform" class="input" aria-label="Plataforma">
-          <option value="all" selected>Todas las plataformas</option>
-          <option value="instagram">Instagram</option>
-          <option value="tiktok">TikTok</option>
-          <option value="facebook">Facebook</option>
-          <option value="x">X (Twitter)</option>
-          <option value="youtube">YouTube</option>
-          <option value="linkedin">LinkedIn</option>
-        </select>
-
-        <select id="region" class="input" aria-label="Región">
-          <option value="MX" selected>México</option>
-          <option value="LATAM">LatAm</option>
-          <option value="US">Estados Unidos</option>
-          <option value="ES">España</option>
-          <option value="GLOBAL">Global</option>
-        </select>
-
-        <select id="days" class="input" aria-label="Días">
-          <option value="7">7</option>
-          <option value="14">14</option>
-          <option value="30" selected>30</option>
-          <option value="60">60</option>
-          <option value="90">90</option>
-        </select>
-
-        <!-- Si quieres tema específico, descomenta:
-        <input id="topic" class="input" placeholder="Tema o categoría (opcional)">
-        -->
-
         <button id="run" class="btn">
           Generar reporte
           <span id="loading" class="loading-dot">• • •</span>
         </button>
+        <button id="downloadPdf" class="btn secondary">Descargar PDF</button>
       </div>
     </div>
 
     <main>
-      <section class="card">
-        <h2>REPORTE DE TENDENCIAS (ÚLTIMOS <span id="days-label">30</span> DÍAS)</h2>
-        <p id="context-label" class="sub">Plataforma: all • Región: MX</p>
-        <ul id="list-trends">
+      <!-- Resumen / patrones -->
+      <section class="card no-break">
+        <h2>REPORTE DE TENDENCIAS — LILLY MÉXICO</h2>
+        <p id="context-label" class="sub">LinkedIn • Instagram • Facebook • TikTok — Último mes + próximo mes</p>
+
+        <h3>Resumen ejecutivo</h3>
+        <ul id="executive_summary">
+          <li>—</li><li>—</li><li>—</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">Último mes: señales y patrones</h3>
+        <ul id="last_month_patterns">
           <li>—</li><li>—</li><li>—</li><li>—</li><li>—</li>
         </ul>
       </section>
 
-      <section class="card">
-        <h2>PRONÓSTICO (PRÓXIMO MES)</h2>
-        <p class="sub">Temas y formatos con probabilidad de crecimiento</p>
-        <ul id="list-forecast">
-          <li>—</li><li>—</li><li>—</li>
+      <!-- Oportunidades -->
+      <section class="card no-break">
+        <h2>PRÓXIMO MES</h2>
+        <p class="sub">Oportunidades de contenido (validar efemérides antes de publicar)</p>
+
+        <h3>Oportunidades</h3>
+        <ul id="next_month_opportunities">
+          <li>—</li><li>—</li><li>—</li><li>—</li><li>—</li>
+        </ul>
+      </section>
+
+      <!-- Gráficas -->
+      <section class="card full no-break">
+        <h2>GRÁFICAS</h2>
+        <p class="sub">Datasets sugeridos (no implican métricas reales; son recomendación editorial)</p>
+
+        <div class="grid-2">
+          <div class="card" style="box-shadow:none; border:1px solid #e5e7eb;">
+            <h3>Mix recomendado de formatos</h3>
+            <p class="sub" style="margin-bottom:10px;">Distribución editorial sugerida (≈100%)</p>
+            <canvas id="chartMix" height="220"></canvas>
+          </div>
+
+          <div class="card" style="box-shadow:none; border:1px solid #e5e7eb;">
+            <h3>Oportunidades por semana</h3>
+            <p class="sub" style="margin-bottom:10px;">Cantidad de oportunidades propuestas</p>
+            <canvas id="chartOpps" height="220"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Calendario -->
+      <section class="card full">
+        <h2>CALENDARIO EDITORIAL RECOMENDADO (4 SEMANAS)</h2>
+        <p class="sub">Cada elemento incluye formato, hook y nota de compliance</p>
+
+        <div id="calendar"></div>
+      </section>
+
+      <!-- Temas priorizados -->
+      <section class="card full">
+        <h2>TEMAS PRIORIZADOS</h2>
+        <p class="sub">Ideas con enfoque y mitigación de riesgos</p>
+
+        <div id="topics"></div>
+      </section>
+
+      <!-- Fuentes -->
+      <section class="card full no-break">
+        <h2>FUENTES RECOMENDADAS</h2>
+        <p class="sub">Para respaldo de claims (no implica consulta; son fuentes recomendadas)</p>
+
+        <ul id="sources">
+          <li>—</li>
+        </ul>
+
+        <h3 style="margin-top:18px;">Referencias (formato APA)</h3>
+        <ul id="apa">
+          <li>—</li>
         </ul>
       </section>
     </main>
@@ -144,23 +243,25 @@
   <div class="brand">SOCIAL MEDIA TOOLS BY HOOD.</div>
 
   <script>
-    // --- DOM refs
-    const $platform     = document.getElementById('platform');
-    const $region       = document.getElementById('region');
-    const $days         = document.getElementById('days');
-    const $run          = document.getElementById('run');
-    const $loading      = document.getElementById('loading');
-    const $listTrends   = document.getElementById('list-trends');
-    const $listForecast = document.getElementById('list-forecast');
-    const $contextLabel = document.getElementById('context-label');
-    const $daysLabel    = document.getElementById('days-label');
-    // const $topic     = document.getElementById('topic'); // si lo usas
+    const $run = document.getElementById('run');
+    const $loading = document.getElementById('loading');
+    const $downloadPdf = document.getElementById('downloadPdf');
 
-    // --- helpers
+    const $exec = document.getElementById('executive_summary');
+    const $last = document.getElementById('last_month_patterns');
+    const $next = document.getElementById('next_month_opportunities');
+    const $calendar = document.getElementById('calendar');
+    const $topics = document.getElementById('topics');
+    const $sources = document.getElementById('sources');
+    const $apa = document.getElementById('apa');
+
+    let mixChart = null;
+    let oppsChart = null;
+
     function renderList(ul, items){
       ul.innerHTML = '';
       if(!items || !items.length){
-        ul.innerHTML = '<li>No se encontraron señales claras.</li>';
+        ul.innerHTML = '<li>No se encontraron elementos claros.</li>';
         return;
       }
       items.forEach(t => {
@@ -170,22 +271,174 @@
       });
     }
 
-    function updateContextLabel(){
-      $contextLabel.textContent = `Plataforma: ${$platform.value} • Región: ${$region.value}`;
-      $daysLabel.textContent = String($days.value || 30);
+    function renderSources(ul, items){
+      ul.innerHTML = '';
+      if(!items || !items.length){
+        ul.innerHTML = '<li>Sin fuentes sugeridas.</li>';
+        return;
+      }
+      items.forEach(s => {
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = s.url;
+        a.target = "_blank";
+        a.rel = "noreferrer";
+        a.className = "clean-link";
+        a.textContent = `${s.name} — ${s.use_case}`;
+        li.appendChild(a);
+        ul.appendChild(li);
+      });
     }
 
-    // --- UI bindings
-    ['change','input'].forEach(evt => {
-      $platform.addEventListener(evt, updateContextLabel);
-      $region.addEventListener(evt, updateContextLabel);
-      $days.addEventListener(evt, updateContextLabel);
-    });
-    updateContextLabel();
+    function renderCalendar(container, weeks){
+      container.innerHTML = '';
+      if(!weeks || !weeks.length){
+        container.innerHTML = '<p class="sub">No hay calendario disponible.</p>';
+        return;
+      }
 
-    // --- Acción principal: llamar a /api/chat
+      weeks.forEach(week => {
+        const box = document.createElement('div');
+        box.className = 'card';
+        box.style.boxShadow = 'none';
+        box.style.border = '1px solid #e5e7eb';
+        box.style.marginBottom = '14px';
+
+        const h = document.createElement('h3');
+        h.textContent = week.week_label;
+        box.appendChild(h);
+
+        const table = document.createElement('table');
+        table.className = 'table';
+        table.innerHTML = `
+          <thead>
+            <tr>
+              <th>Tema</th>
+              <th>Objetivo</th>
+              <th>Plataforma</th>
+              <th>Formato</th>
+              <th>Hook</th>
+              <th>Compliance</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        `;
+
+        const tbody = table.querySelector('tbody');
+        week.items.forEach(it => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td><strong>${escapeHtml(it.theme)}</strong></td>
+            <td>${escapeHtml(it.objective)}</td>
+            <td><span class="pill">${escapeHtml(it.platform)}</span></td>
+            <td>${escapeHtml(it.format)}</td>
+            <td>${escapeHtml(it.hook)}</td>
+            <td>${escapeHtml(it.compliance_note)}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+
+        box.appendChild(table);
+        container.appendChild(box);
+      });
+    }
+
+    function renderTopics(container, topics){
+      container.innerHTML = '';
+      if(!topics || !topics.length){
+        container.innerHTML = '<p class="sub">Sin temas priorizados.</p>';
+        return;
+      }
+
+      const table = document.createElement('table');
+      table.className = 'table';
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Tema</th>
+            <th>Por qué importa</th>
+            <th>Enfoque sugerido</th>
+            <th>Riesgos</th>
+            <th>Mitigación</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      `;
+
+      const tbody = table.querySelector('tbody');
+
+      topics.forEach(t => {
+        const risks = (t.risk_flags || []).map(r => `• ${r}`).join('<br/>');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(t.topic)}</strong></td>
+          <td>${escapeHtml(t.why_it_matters)}</td>
+          <td>${escapeHtml(t.recommended_angle)}</td>
+          <td>${risks}</td>
+          <td>${escapeHtml(t.mitigation)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      container.appendChild(table);
+    }
+
+    function escapeHtml(str){
+      return String(str ?? '')
+        .replaceAll('&','&amp;')
+        .replaceAll('<','&lt;')
+        .replaceAll('>','&gt;')
+        .replaceAll('"','&quot;')
+        .replaceAll("'","&#039;");
+    }
+
+    function renderCharts(charts){
+      // 1) Mix
+      const mix = charts?.format_mix;
+      if(mix?.labels?.length && mix?.values?.length){
+        if(mixChart) mixChart.destroy();
+        mixChart = new Chart(document.getElementById('chartMix'), {
+          type: 'doughnut',
+          data: {
+            labels: mix.labels,
+            datasets: [{ data: mix.values }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'bottom' }
+            }
+          }
+        });
+      }
+
+      // 2) Opps
+      const opps = charts?.opportunities_per_week;
+      if(opps?.labels?.length && opps?.values?.length){
+        if(oppsChart) oppsChart.destroy();
+        oppsChart = new Chart(document.getElementById('chartOpps'), {
+          type: 'bar',
+          data: {
+            labels: opps.labels,
+            datasets: [{ data: opps.values }]
+          },
+          options: {
+            responsive: true,
+            plugins: { legend: { display: false } },
+            scales: {
+              y: { beginAtZero: true, ticks: { precision: 0 } }
+            }
+          }
+        });
+      }
+    }
+
+    $downloadPdf.addEventListener('click', () => {
+      // Tip: el usuario puede elegir "Guardar como PDF"
+      window.print();
+    });
+
     $run.addEventListener('click', async () => {
-      updateContextLabel();
       $loading.style.display = 'inline';
       $run.disabled = true;
 
@@ -194,19 +447,25 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            mode: 'tendencias',
-            platform: $platform.value,
-            region: $region.value,
-            days: Number($days.value || 30),
-            // topic: ($topic?.value || '')
+            mode: 'tendencias_lilly_mx'
           })
         });
 
         const data = await res.json();
         if(!res.ok) throw new Error(data?.error || 'Error en la API');
 
-        renderList($listTrends, data.top5 || []);
-        renderList($listForecast, data.forecast || []);
+        renderList($exec, data.executive_summary || []);
+        renderList($last, data.last_month_patterns || []);
+        renderList($next, data.next_month_opportunities || []);
+
+        renderCalendar($calendar, data.weekly_calendar || []);
+        renderTopics($topics, data.priority_topics || []);
+
+        renderSources($sources, data.recommended_sources || []);
+        renderList($apa, data.apa_references || []);
+
+        renderCharts(data.charts || {});
+
       } catch (err) {
         console.error(err);
         alert('Error al generar el reporte. Revisa la consola y vuelve a intentar.');
