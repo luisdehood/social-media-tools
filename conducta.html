@@ -7,17 +7,15 @@
   <meta name="description" content="Directrices de formato y buenas prácticas para Lilly México." />
   <meta name="color-scheme" content="light" />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --lilly-red: #DF3024;
-      --lilly-red-dark: #C1281E;
       --bg-soft: #ffffff;
       --text: #383838;
       --white: #ffffff;
       --muted: rgba(49, 49, 49, 0.65);
       --shadow: 0 8px 24px rgba(0,0,0,.08);
-      --radius: 18px;
-      --radius-lg: 22px;
       --container: 1120px;
     }
     *{ box-sizing: border-box; }
@@ -42,14 +40,14 @@
       flex-direction: column;
       gap: 24px;
     }
-    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:32px; padding-top:12px; width:100vw; padding:0 20px; }
+    .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:32px; width:100vw; padding:0 20px; }
     .topbar-inner{ width:100%; display:flex; align-items:center; justify-content:space-between; padding:12px 0; }
-    .brand{ display: inline-flex; align-items: center; gap: 12px; min-height: 60px; }
-    .brand img{ display: block; height: 44px; }
+    .brand{ display:inline-flex; align-items:center; gap:12px; min-height:60px; }
+    .brand img{ display:block; height:44px; }
     .brand-fallback{
       font-family: "Georgia", "Times New Roman", serif;
       font-size: 35px; font-style: italic; color: var(--lilly-red);
-      text-shadow: 0 2px 0 rgba(0,0,0,.05); user-select: none;
+      text-shadow: 0 2px 0 rgba(0,0,0,.05); user-select:none;
     }
     .title{
       font-family:'Bebas Neue', sans-serif; font-weight:bold; letter-spacing:.5px;
@@ -67,33 +65,19 @@
     }
     .back:hover{ filter:brightness(1.1); }
 
-    .filters{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
-    .select{
-      background: var(--white); border: 1.5px solid rgba(0,0,0,.08);
-      border-radius: 12px; padding: 10px 12px; min-height: 40px;
-      box-shadow: var(--shadow); color: var(--text);
-    }
+    .filters{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
     .run{
       background:#111; color:#fff; border:0; border-radius:14px; padding:12px 18px;
       font-weight:800; cursor:pointer; box-shadow:var(--shadow);
     }
     .run:hover{ filter:brightness(1.1); }
-
     .secondary{
-      background: #fff;
-      border: 1.5px solid rgba(0,0,0,.08);
-      color: #111;
-      border-radius: 14px;
-      padding: 12px 18px;
-      font-weight: 800;
-      cursor: pointer;
-      box-shadow: var(--shadow);
+      background:#fff; color:#111; border:1.5px solid rgba(0,0,0,.08);
+      border-radius:14px; padding:12px 18px; font-weight:800; cursor:pointer; box-shadow:var(--shadow);
     }
     .secondary:hover{ filter:brightness(1.03); }
 
-    .grid{
-      display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
-    }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:20px; }
     .card{ background:var(--white); border-radius:12px; box-shadow:0 12px 24px rgba(0,0,0,.15); padding:18px; }
     .card h2{ margin:0 0 10px; font-size:22px; color:#111; font-family:'Bebas Neue', sans-serif; letter-spacing:.3px; text-transform:uppercase; }
     .muted{ color: var(--muted); font-size: 13px; }
@@ -102,15 +86,13 @@
     li{ margin: 6px 0; }
 
     .loading{
-      display: none; align-items: center; gap: 10px; color: var(--muted);
-      font-weight: 600;
+      display:none; align-items:center; gap:10px; color:var(--muted);
+      font-weight:600;
     }
-    .dot{ width: 8px; height: 8px; border-radius: 50%;
-      background: var(--lilly-red); animation: pulse 1s infinite ease-in-out;
-    }
-    .dot:nth-child(2){ animation-delay: .2s; }
-    .dot:nth-child(3){ animation-delay: .4s; }
-    @keyframes pulse{ 0%,100%{ transform: scale(.7); opacity:.6 } 50%{ transform: scale(1); opacity:1 } }
+    .dot{ width:8px; height:8px; border-radius:50%; background: var(--lilly-red); animation:pulse 1s infinite ease-in-out; }
+    .dot:nth-child(2){ animation-delay:.2s; }
+    .dot:nth-child(3){ animation-delay:.4s; }
+    @keyframes pulse{ 0%,100%{ transform:scale(.7); opacity:.6 } 50%{ transform:scale(1); opacity:1 } }
 
     .error{
       display:none;
@@ -132,15 +114,12 @@
       text-transform:uppercase; font-size:12px; color:#111; opacity:.7; text-align:center;
     }
 
-    /* ✅ PDF: estilos de impresión */
+    /* PDF */
     @media print {
-      .topbar, .actions, footer, .no-print { display: none !important; }
-      body{
-        background: #fff !important;
-        background-image: none !important;
-      }
-      .wrap{ padding: 0 !important; max-width: 100% !important; }
-      .card{ box-shadow: none !important; border: 1px solid rgba(0,0,0,.12); }
+      .topbar, .actions, footer, .no-print { display:none !important; }
+      body{ background:#fff !important; background-image:none !important; }
+      .wrap{ padding:0 !important; max-width:100% !important; }
+      .card{ box-shadow:none !important; border: 1px solid rgba(0,0,0,.12); }
     }
 
     @media (max-width: 900px){
@@ -162,23 +141,7 @@
   <main class="wrap" role="main">
     <div class="actions">
       <a class="back" href="index.html" aria-label="Volver al inicio">⟵ Volver</a>
-
       <div class="filters" role="group" aria-label="Acciones">
-        <!-- ✅ Selectores: los dejamos, pero los ocultamos (ya no se usan en esta fase) -->
-        <select id="platform" class="select no-print" aria-label="Plataforma" style="display:none">
-          <option value="Instagram">Instagram</option>
-          <option value="Facebook">Facebook</option>
-          <option value="TikTok">TikTok</option>
-          <option value="LinkedIn">LinkedIn</option>
-          <option value="X">X (Twitter)</option>
-        </select>
-
-        <select id="region" class="select no-print" aria-label="Región" style="display:none">
-          <option value="MX">México</option>
-          <option value="LATAM">LATAM</option>
-          <option value="Global">Global</option>
-        </select>
-
         <button id="run" class="run">Actualizar conducta</button>
         <button id="pdf" class="secondary">Descargar PDF</button>
       </div>
@@ -195,55 +158,41 @@
       <article class="card">
         <h2>Señales y comportamiento del algoritmo</h2>
         <p class="muted" id="contextLabel">Reporte para Lilly México • 4 plataformas</p>
-        <ul id="listChanges">
-          <li>—</li>
-          <li>—</li>
-          <li>—</li>
-        </ul>
+        <ul id="listChanges"><li>—</li></ul>
       </article>
 
       <article class="card">
         <h2>Buenas prácticas actuales</h2>
         <p class="muted">Directrices claras para producir contenido</p>
-        <ul id="listBestPractices">
-          <li>—</li>
-          <li>—</li>
-          <li>—</li>
-        </ul>
+        <ul id="listBestPractices"><li>—</li></ul>
       </article>
 
       <article class="card">
         <h2>Riesgos / Flags de compliance</h2>
         <p class="muted">Puntos a vigilar en farma (copys, claims, referencias)</p>
-        <ul id="listCompliance">
-          <li>—</li>
-          <li>—</li>
-          <li>—</li>
-        </ul>
+        <ul id="listCompliance"><li>—</li></ul>
       </article>
 
       <article class="card">
         <h2>Checklist por formato</h2>
         <p class="muted">Video corto, Carrusel, Estático, Stories, Live</p>
-        <ul id="listChecklist">
-          <li>—</li>
-          <li>—</li>
-          <li>—</li>
-        </ul>
+        <ul id="listChecklist"><li>—</li></ul>
       </article>
 
-      <!-- (Opcional) Zona lista para gráficas después -->
-      <!--
       <article class="card" style="grid-column: 1 / -1;">
-        <h2>Gráficas</h2>
-        <p class="muted">Mix recomendado y señales por plataforma (pendiente)</p>
-        <div>...</div>
+        <h2>Gráfica</h2>
+        <p class="muted">Mix recomendado de formatos por plataforma</p>
+        <div style="background:#fff;border-radius:12px;padding:12px;">
+          <canvas id="chartFormats" height="120"></canvas>
+        </div>
       </article>
-      -->
     </section>
 
     <footer><p>© 2025 Social Media Tools by Hood. All Rights Reserved.</p></footer>
   </main>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <script>
     const $run      = document.getElementById('run');
@@ -257,12 +206,19 @@
     const $listCompliance  = document.getElementById('listCompliance');
     const $listChecklist   = document.getElementById('listChecklist');
 
+    function stripBullets(s){
+      return String(s || "")
+        .replace(/^\s*[•\-\u2022]+\s*/g, "")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
     function renderList(el, items){
       el.innerHTML = '';
       const safe = Array.isArray(items) && items.length ? items : ['—'];
       safe.forEach(t => {
         const li = document.createElement('li');
-        li.textContent = String(t);
+        li.textContent = stripBullets(t);
         el.appendChild(li);
       });
     }
@@ -276,44 +232,94 @@
       $error.style.display = 'none';
     }
 
-    // ✅ Mapeo del JSON del backend (conducta_lilly_mx) a tus 4 cuadros
+    // Chart
+    let chartFormatsInstance = null;
+
+    function renderFormatMixChart(charts){
+      const mix = charts?.format_mix_by_platform;
+      if (!mix) return;
+
+      const canvas = document.getElementById("chartFormats");
+      if (!canvas) return;
+
+      const platforms = Array.isArray(mix.platforms) ? mix.platforms : [];
+      const formats   = Array.isArray(mix.formats) ? mix.formats : [];
+      const values    = Array.isArray(mix.values) ? mix.values : [];
+
+      const datasets = formats.map((fmt, fmtIdx) => ({
+        label: fmt,
+        data: platforms.map((_, pIdx) => {
+          const row = values[pIdx] || [];
+          const v = row[fmtIdx];
+          return typeof v === "number" ? v : 0;
+        })
+      }));
+
+      if (chartFormatsInstance) chartFormatsInstance.destroy();
+
+      chartFormatsInstance = new Chart(canvas, {
+        type: "bar",
+        data: { labels: platforms, datasets },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { position: "bottom" },
+            tooltip: { enabled: true }
+          },
+          scales: {
+            x: { stacked: true },
+            y: { stacked: true, beginAtZero: true }
+          }
+        }
+      });
+    }
+
     function mapToCards(data){
-      // 1) “Señales y comportamiento” -> juntamos señales por plataforma (top 2 por plataforma)
+      // 1) Señales -> frases claras + acción inmediata
       const changes = [];
       if (Array.isArray(data?.platform_guidelines)) {
         data.platform_guidelines.forEach(pg => {
-          const p = pg.platform || 'Plataforma';
-          const sig = Array.isArray(pg.signals) ? pg.signals.slice(0, 2) : [];
-          sig.forEach(s => changes.push(`${p}: ${s}`));
+          const p = pg.platform || "Plataforma";
+          const sig = Array.isArray(pg.signals) ? pg.signals.slice(0, 3) : [];
+          if (sig.length) {
+            changes.push(`${p}: Prioriza ${sig.map(stripBullets).join(" · ")}.`);
+          }
+
+          const fmt = Array.isArray(pg.recommended_formats) ? pg.recommended_formats[0] : null;
+          if (fmt?.format && fmt?.specs) {
+            changes.push(`${p}: Formato recomendado: ${stripBullets(fmt.format)} (${stripBullets(fmt.specs)}).`);
+          }
         });
       }
 
-      // 2) “Buenas prácticas” -> formatos recomendados + copy guidelines (capados para no saturar)
+      // 2) Buenas prácticas -> formatos + copy guidelines globales
       const best = [];
       if (Array.isArray(data?.platform_guidelines)) {
         data.platform_guidelines.forEach(pg => {
-          const p = pg.platform || 'Plataforma';
+          const p = pg.platform || "Plataforma";
           const fmts = Array.isArray(pg.recommended_formats) ? pg.recommended_formats.slice(0, 2) : [];
-          fmts.forEach(f => best.push(`${p}: ${f.format} — ${f.specs}`));
+          fmts.forEach(f => {
+            const when = f.when_to_use ? ` — ${stripBullets(f.when_to_use)}` : "";
+            best.push(`${p}: ${stripBullets(f.format)}${when}`);
+          });
         });
 
-        // Añadimos guidelines globales (de la primera plataforma) para no duplicar demasiado
         const first = data.platform_guidelines[0];
-        const cg = Array.isArray(first?.copy_guidelines) ? first.copy_guidelines.slice(0, 6) : [];
-        cg.forEach(t => best.push(t));
+        const cg = Array.isArray(first?.copy_guidelines) ? first.copy_guidelines.slice(0, 8) : [];
+        cg.forEach(t => best.push(stripBullets(t)));
       }
 
-      // 3) Compliance
-      const compliance = Array.isArray(data?.compliance_risks) ? data.compliance_risks : [];
+      const compliance = Array.isArray(data?.compliance_risks)
+        ? data.compliance_risks.map(stripBullets)
+        : [];
 
-      // 4) Checklist por formato -> convertimos objetos a bullets legibles
       const checklist = [];
       if (Array.isArray(data?.format_checklist)) {
         data.format_checklist.forEach(fc => {
-          const title = fc.format || 'Formato';
+          const title = stripBullets(fc.format || "Formato");
           checklist.push(`${title}:`);
-          const cps = Array.isArray(fc.checkpoints) ? fc.checkpoints.slice(0, 4) : [];
-          cps.forEach(c => checklist.push(`• ${c}`));
+          const cps = Array.isArray(fc.checkpoints) ? fc.checkpoints.slice(0, 6) : [];
+          cps.forEach(c => checklist.push(stripBullets(c)));
         });
       }
 
@@ -342,33 +348,33 @@
       try {
         const data = await fetchConducta();
 
-        // Contexto
-        $contextLabel.textContent = `Reporte para Lilly México • ${Array.isArray(data?.platforms) ? data.platforms.join(', ') : '4 plataformas'}`;
+        $contextLabel.textContent =
+          `Reporte para Lilly México • ${Array.isArray(data?.platforms) ? data.platforms.join(', ') : 'LinkedIn, Instagram, Facebook, TikTok'}`;
 
-        // Render
         const mapped = mapToCards(data);
         renderList($listChanges, mapped.changes);
         renderList($listBest, mapped.best);
         renderList($listCompliance, mapped.compliance);
         renderList($listChecklist, mapped.checklist);
 
+        // Gráfica
+        if (data?.charts) renderFormatMixChart(data.charts);
+
       } catch (e) {
         console.error(e);
-        showError('No se pudo generar el reporte de conducta. Revisa la conexión o intenta de nuevo.');
+        showError('No se pudo generar el reporte de conducta. Intenta de nuevo o revisa los logs de Vercel.');
       } finally {
         $loading.style.display = 'none';
         $run.disabled = false;
       }
     });
 
-    // PDF
     $pdf.addEventListener('click', () => {
       clearError();
       window.print();
     });
 
-    // Estado inicial
-    // (Opcional) Puedes auto-ejecutar al cargar:
+    // Opcional: auto-run al abrir
     // $run.click();
   </script>
 </body>
